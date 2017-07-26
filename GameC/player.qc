@@ -379,7 +379,7 @@ local entity	bubble;
 	if (self.owner.waterlevel != 3)
 		return;
 	bubble = spawn();
-	setmodel (bubble, "progs/s_bubble.spr");
+	setmodel (bubble, "models/s_bubble.spr");
 	setorigin (bubble, self.owner.origin + '0 0 24');
 	bubble.movetype = MOVETYPE_NOCLIP;
 	bubble.solid = SOLID_NOT;
@@ -514,10 +514,10 @@ void(string gibname, float dm) ThrowHead =
 
 void() GibPlayer =
 {
-	ThrowHead ("progs/h_player.mdl", self.health);
-	ThrowGib ("progs/gib1.mdl", self.health);
-	ThrowGib ("progs/gib2.mdl", self.health);
-	ThrowGib ("progs/gib3.mdl", self.health);
+	ThrowHead ("models/h_player.mdl", self.health);
+	ThrowGib ("models/gib1.mdl", self.health);
+	ThrowGib ("models/gib2.mdl", self.health);
+	ThrowGib ("models/gib3.mdl", self.health);
 
 	self.deadflag = DEAD_DEAD;
 
@@ -598,7 +598,7 @@ void() PlayerDie =
 
 void() set_suicide_frame =
 {	// used by klill command and diconnect command
-	if (self.model != "progs/player.mdl")
+	if (self.model != "models/player.mdl")
 		return;	// allready gibbed
 	self.frame = $deatha11;
 	self.solid = SOLID_NOT;

@@ -237,7 +237,7 @@ void(vector p) boss_missile =
 	vec = normalize (d - org);
 
 	launch_spike (org, vec);
-	setmodel (newmis, "progs/lavaball.mdl");
+	setmodel (newmis, "models/lavaball.mdl");
 	newmis.avelocity = '200 100 300';
 	setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);		
 	newmis.velocity = vec*300;
@@ -256,7 +256,7 @@ void() boss_awake =
 	self.movetype = MOVETYPE_STEP;
 	self.takedamage = DAMAGE_NO;
 	
-	setmodel (self, "progs/boss.mdl");
+	setmodel (self, "models/boss.mdl");
 	setsize (self, '-128 -128 -24', '128 128 256');
 	
 	if (skill == 0)
@@ -286,8 +286,8 @@ void() monster_boss =
 		remove(self);
 		return;
 	}
-	precache_model ("progs/boss.mdl");
-	precache_model ("progs/lavaball.mdl");
+	precache_model ("models/boss.mdl");
+	precache_model ("models/lavaball.mdl");
 
 	precache_sound ("weapons/rocket1i.wav");
 	precache_sound ("boss1/out1.wav");

@@ -234,10 +234,10 @@ void() knight_die =
 	if (self.health < -40)
 	{
 		sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
-		ThrowHead ("progs/h_knight.mdl", self.health);
-		ThrowGib ("progs/gib1.mdl", self.health);
-		ThrowGib ("progs/gib2.mdl", self.health);
-		ThrowGib ("progs/gib3.mdl", self.health);
+		ThrowHead ("models/h_knight.mdl", self.health);
+		ThrowGib ("models/gib1.mdl", self.health);
+		ThrowGib ("models/gib2.mdl", self.health);
+		ThrowGib ("models/gib3.mdl", self.health);
 		return;
 	}
 
@@ -259,8 +259,8 @@ void() monster_knight =
 		remove(self);
 		return;
 	}
-	precache_model ("progs/knight.mdl");
-	precache_model ("progs/h_knight.mdl");
+	precache_model ("models/knight.mdl");
+	precache_model ("models/h_knight.mdl");
 
 	precache_sound ("knight/kdeath.wav");
 	precache_sound ("knight/khurt.wav");
@@ -272,7 +272,7 @@ void() monster_knight =
 	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_STEP;
 
-	setmodel (self, "progs/knight.mdl");
+	setmodel (self, "models/knight.mdl");
 
 	setsize (self, '-16 -16 -24', '16 16 40');
 	self.health = 75;

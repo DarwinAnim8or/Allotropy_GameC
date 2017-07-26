@@ -92,7 +92,7 @@ void(float offset) hknight_shot =
 	
 	launch_spike (org, vec);
 	newmis.classname = "knightspike";
-	setmodel (newmis, "progs/k_spike.mdl");
+	setmodel (newmis, "models/k_spike.mdl");
 	setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);		
 	newmis.velocity = vec*300;
 	sound (self, CHAN_WEAPON, "hknight/attack1.wav", 1, ATTN_NORM);
@@ -221,10 +221,10 @@ void() hknight_die =
 	if (self.health < -40)
 	{
 		sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
-		ThrowHead ("progs/h_hellkn.mdl", self.health);
-		ThrowGib ("progs/gib1.mdl", self.health);
-		ThrowGib ("progs/gib2.mdl", self.health);
-		ThrowGib ("progs/gib3.mdl", self.health);
+		ThrowHead ("models/h_hellkn.mdl", self.health);
+		ThrowGib ("models/gib1.mdl", self.health);
+		ThrowGib ("models/gib2.mdl", self.health);
+		ThrowGib ("models/gib3.mdl", self.health);
 		return;
 	}
 
@@ -421,9 +421,9 @@ void() monster_hell_knight =
 		remove(self);
 		return;
 	}
-	precache_model2 ("progs/hknight.mdl");
-	precache_model2 ("progs/k_spike.mdl");
-	precache_model2 ("progs/h_hellkn.mdl");
+	precache_model2 ("models/hknight.mdl");
+	precache_model2 ("models/k_spike.mdl");
+	precache_model2 ("models/h_hellkn.mdl");
 
 	
 	precache_sound2 ("hknight/attack1.wav");
@@ -441,7 +441,7 @@ void() monster_hell_knight =
 	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_STEP;
 
-	setmodel (self, "progs/hknight.mdl");
+	setmodel (self, "models/hknight.mdl");
 
 	setsize (self, '-16 -16 -24', '16 16 40');
 	self.health = 250;

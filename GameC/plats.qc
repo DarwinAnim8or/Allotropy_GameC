@@ -366,8 +366,8 @@ void() misc_teleporttrain =
 	self.noise1 = ("misc/null.wav");
 	precache_sound ("misc/null.wav");
 
-	precache_model2 ("progs/teleport.mdl");
-	setmodel (self, "progs/teleport.mdl");
+	precache_model2 ("models/teleport.mdl");
+	setmodel (self, "models/teleport.mdl");
 	setsize (self, self.mins , self.maxs);
 	setorigin (self, self.origin);
 

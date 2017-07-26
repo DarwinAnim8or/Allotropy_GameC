@@ -81,7 +81,7 @@ void() OgreGrenadeExplode =
 
 	self.velocity = '0 0 0';
 	self.touch = SUB_Null;
-	setmodel (self, "progs/s_explod.spr");
+	setmodel (self, "models/s_explod.spr");
 	self.solid = SOLID_NOT;
 	s_explode1 ();
 };
@@ -136,7 +136,7 @@ void() OgreFireGrenade =
 	missile.nextthink = time + 2.5;
 	missile.think = OgreGrenadeExplode;
 
-	setmodel (missile, "progs/grenade.mdl");
+	setmodel (missile, "models/grenade.mdl");
 	setsize (missile, '0 0 0', '0 0 0');		
 	setorigin (missile, self.origin);
 };
@@ -405,10 +405,10 @@ void() ogre_die =
 	if (self.health < -80)
 	{
 		sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
-		ThrowHead ("progs/h_ogre.mdl", self.health);
-		ThrowGib ("progs/gib3.mdl", self.health);
-		ThrowGib ("progs/gib3.mdl", self.health);
-		ThrowGib ("progs/gib3.mdl", self.health);
+		ThrowHead ("models/h_ogre.mdl", self.health);
+		ThrowGib ("models/gib3.mdl", self.health);
+		ThrowGib ("models/gib3.mdl", self.health);
+		ThrowGib ("models/gib3.mdl", self.health);
 		return;
 	}
 
@@ -439,9 +439,9 @@ void() monster_ogre =
 		remove(self);
 		return;
 	}
-	precache_model ("progs/ogre.mdl");
-	precache_model ("progs/h_ogre.mdl");
-	precache_model ("progs/grenade.mdl");
+	precache_model ("models/ogre.mdl");
+	precache_model ("models/h_ogre.mdl");
+	precache_model ("models/grenade.mdl");
 
 	precache_sound ("ogre/ogdrag.wav");
 	precache_sound ("ogre/ogdth.wav");
@@ -454,7 +454,7 @@ void() monster_ogre =
 	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_STEP;
 
-	setmodel (self, "progs/ogre.mdl");
+	setmodel (self, "models/ogre.mdl");
 
 	setsize (self, VEC_HULL2_MIN, VEC_HULL2_MAX);
 	self.health = 200;

@@ -124,7 +124,7 @@ void(vector org, vector vel) SpawnMeatSpray =
 	missile.nextthink = time + 1;
 	missile.think = SUB_Remove;
 
-	setmodel (missile, "progs/zom_gib.mdl");
+	setmodel (missile, "models/zom_gib.mdl");
 	setsize (missile, '0 0 0', '0 0 0');		
 	setorigin (missile, org);
 };
@@ -339,7 +339,7 @@ void() BecomeExplosion =
 	self.movetype = MOVETYPE_NONE;
 	self.velocity = '0 0 0';
 	self.touch = SUB_Null;
-	setmodel (self, "progs/s_explod.spr");
+	setmodel (self, "models/s_explod.spr");
 	self.solid = SOLID_NOT;
 	s_explode1 ();
 };
@@ -417,7 +417,7 @@ void() W_FireRocket =
 	missile.nextthink = time + 5;
 	missile.think = SUB_Remove;
 
-	setmodel (missile, "progs/missile.mdl");
+	setmodel (missile, "models/missile.mdl");
 	setsize (missile, '0 0 0', '0 0 0');		
 	setorigin (missile, self.origin + v_forward*8 + '0 0 16');
 };
@@ -603,7 +603,7 @@ void() W_FireGrenade =
 	missile.nextthink = time + 2.5;
 	missile.think = GrenadeExplode;
 
-	setmodel (missile, "progs/grenade.mdl");
+	setmodel (missile, "models/grenade.mdl");
 	setsize (missile, '0 0 0', '0 0 0');		
 	setorigin (missile, self.origin);
 };
@@ -635,7 +635,7 @@ void(vector org, vector dir) launch_spike =
 	newmis.classname = "spike";
 	newmis.think = SUB_Remove;
 	newmis.nextthink = time + 6;
-	setmodel (newmis, "progs/spike.mdl");
+	setmodel (newmis, "models/spike.mdl");
 	setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);		
 	setorigin (newmis, org);
 
@@ -652,7 +652,7 @@ void() W_FireSuperSpikes =
 	dir = aim (self, 1000);
 	launch_spike (self.origin + '0 0 16', dir);
 	newmis.touch = superspike_touch;
-	setmodel (newmis, "progs/s_spike.mdl");
+	setmodel (newmis, "models/s_spike.mdl");
 	setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);		
 	self.punchangle_x = -2;
 };
@@ -778,55 +778,55 @@ void() W_SetCurrentAmmo =
 	if (self.weapon == IT_AXE)
 	{
 		self.currentammo = 0;
-		self.weaponmodel = "progs/v_axe.mdl";
+		self.weaponmodel = "models/v_axe.mdl";
 		self.weaponframe = 0;
 	}
 	else if (self.weapon == IT_SHOTGUN)
 	{
 		self.currentammo = self.ammo_shells;
-		self.weaponmodel = "progs/v_shot.mdl";
+		self.weaponmodel = "models/v_shot.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_SHELLS;
 	}
 	else if (self.weapon == IT_SUPER_SHOTGUN)
 	{
 		self.currentammo = self.ammo_shells;
-		self.weaponmodel = "progs/v_shot2.mdl";
+		self.weaponmodel = "models/v_shot2.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_SHELLS;
 	}
 	else if (self.weapon == IT_NAILGUN)
 	{
 		self.currentammo = self.ammo_nails;
-		self.weaponmodel = "progs/v_nail.mdl";
+		self.weaponmodel = "models/v_nail.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_NAILS;
 	}
 	else if (self.weapon == IT_SUPER_NAILGUN)
 	{
 		self.currentammo = self.ammo_nails;
-		self.weaponmodel = "progs/v_nail2.mdl";
+		self.weaponmodel = "models/v_nail2.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_NAILS;
 	}
 	else if (self.weapon == IT_GRENADE_LAUNCHER)
 	{
 		self.currentammo = self.ammo_rockets;
-		self.weaponmodel = "progs/v_rock.mdl";
+		self.weaponmodel = "models/v_rock.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_ROCKETS;
 	}
 	else if (self.weapon == IT_ROCKET_LAUNCHER)
 	{
 		self.currentammo = self.ammo_rockets;
-		self.weaponmodel = "progs/v_rock2.mdl";
+		self.weaponmodel = "models/v_rock2.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_ROCKETS;
 	}
 	else if (self.weapon == IT_LIGHTNING)
 	{
 		self.currentammo = self.ammo_cells;
-		self.weaponmodel = "progs/v_light.mdl";
+		self.weaponmodel = "models/v_light.mdl";
 		self.weaponframe = 0;
 		self.items = self.items | IT_CELLS;
 	}

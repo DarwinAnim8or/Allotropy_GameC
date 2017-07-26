@@ -576,10 +576,10 @@ void() PutClientInServer =
 	self.fixangle = TRUE;		// turn this way immediately
 
 // oh, this is a hack!
-	setmodel (self, "progs/eyes.mdl");
+	setmodel (self, "models/eyes.mdl");
 	modelindex_eyes = self.modelindex;
 
-	setmodel (self, "progs/player.mdl");
+	setmodel (self, "models/player.mdl");
 	modelindex_player = self.modelindex;
 
 	setsize (self, VEC_HULL_MIN, VEC_HULL_MAX);

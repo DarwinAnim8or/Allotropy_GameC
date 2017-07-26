@@ -208,7 +208,7 @@ void(vector st) ZombieFireGrenade =
 	missile.nextthink = time + 2.5;
 	missile.think = SUB_Remove;
 
-	setmodel (missile, "progs/zom_gib.mdl");
+	setmodel (missile, "models/zom_gib.mdl");
 	setsize (missile, '0 0 0', '0 0 0');		
 	setorigin (missile, org);
 };
@@ -405,10 +405,10 @@ void() zombie_paine30	=[	$paine30,	zombie_run1		] {};
 void() zombie_die =
 {
 	sound (self, CHAN_VOICE, "zombie/z_gib.wav", 1, ATTN_NORM);
-	ThrowHead ("progs/h_zombie.mdl", self.health);
-	ThrowGib ("progs/gib1.mdl", self.health);
-	ThrowGib ("progs/gib2.mdl", self.health);
-	ThrowGib ("progs/gib3.mdl", self.health);
+	ThrowHead ("models/h_zombie.mdl", self.health);
+	ThrowGib ("models/gib1.mdl", self.health);
+	ThrowGib ("models/gib2.mdl", self.health);
+	ThrowGib ("models/gib3.mdl", self.health);
 };
 
 /*
@@ -493,9 +493,9 @@ void() monster_zombie =
 		return;
 	}
 
-	precache_model ("progs/zombie.mdl");
-	precache_model ("progs/h_zombie.mdl");
-	precache_model ("progs/zom_gib.mdl");
+	precache_model ("models/zombie.mdl");
+	precache_model ("models/h_zombie.mdl");
+	precache_model ("models/zom_gib.mdl");
 
 	precache_sound ("zombie/z_idle.wav");
 	precache_sound ("zombie/z_idle1.wav");
@@ -511,7 +511,7 @@ void() monster_zombie =
 	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_STEP;
 
-	setmodel (self, "progs/zombie.mdl");
+	setmodel (self, "models/zombie.mdl");
 
 	setsize (self, '-16 -16 -24', '16 16 40');
 	self.health = 60;

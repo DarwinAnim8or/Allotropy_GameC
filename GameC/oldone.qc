@@ -223,11 +223,11 @@ void() finale_4 =
 
 				r = random();
 				if (r < 0.3)				
-					ThrowGib ("progs/gib1.mdl", -999);
+					ThrowGib ("models/gib1.mdl", -999);
 				else if (r < 0.6)
-					ThrowGib ("progs/gib2.mdl", -999);
+					ThrowGib ("models/gib2.mdl", -999);
 				else
-					ThrowGib ("progs/gib3.mdl", -999);
+					ThrowGib ("models/gib3.mdl", -999);
 				y = y + 32;
 			}
 			x = x + 32;
@@ -240,7 +240,7 @@ void() finale_4 =
 
 // put a player model down
 	n = spawn();
-	setmodel (n, "progs/player.mdl");
+	setmodel (n, "models/player.mdl");
 	oldo = oldo - '32 264 0';
 	setorigin (n, oldo);
 	n.angles = '0 290 0';
@@ -268,7 +268,7 @@ void() monster_oldone =
 		return;
 	}
 
-	precache_model2 ("progs/oldone.mdl");
+	precache_model2 ("models/oldone.mdl");
 
 	precache_sound2 ("boss2/death.wav");
 	precache_sound2 ("boss2/idle.wav");
@@ -278,7 +278,7 @@ void() monster_oldone =
 	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_STEP;
 	
-	setmodel (self, "progs/oldone.mdl");
+	setmodel (self, "models/oldone.mdl");
 	setsize (self, '-160 -128 -24', '160 128 256');
 
 	self.health = 40000;		// kill by telefrag

@@ -58,7 +58,7 @@ local entity	body;
 	makevectors (self.angles);
 
 	body = spawn();
-	setmodel (body, "progs/soldier.mdl");
+	setmodel (body, "models/soldier.mdl");
 	setorigin (body, self.origin);
 	body.classname = "player";
 	body.health = 1000;

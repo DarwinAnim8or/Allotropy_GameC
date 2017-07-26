@@ -272,39 +272,39 @@ void() worldspawn =
 	precache_sound ("misc/water1.wav");			// swimming
 	precache_sound ("misc/water2.wav");			// swimming
 
-	precache_model ("progs/player.mdl");
-	precache_model ("progs/eyes.mdl");
-	precache_model ("progs/h_player.mdl");
-	precache_model ("progs/gib1.mdl");
-	precache_model ("progs/gib2.mdl");
-	precache_model ("progs/gib3.mdl");
+	precache_model ("models/player.mdl");
+	precache_model ("models/eyes.mdl");
+	precache_model ("models/h_player.mdl");
+	precache_model ("models/gib1.mdl");
+	precache_model ("models/gib2.mdl");
+	precache_model ("models/gib3.mdl");
 
-	precache_model ("progs/s_bubble.spr");	// drowning bubbles
-	precache_model ("progs/s_explod.spr");	// sprite explosion
+	precache_model ("models/s_bubble.spr");	// drowning bubbles
+	precache_model ("models/s_explod.spr");	// sprite explosion
 
-	precache_model ("progs/v_axe.mdl");
-	precache_model ("progs/v_shot.mdl");
-	precache_model ("progs/v_nail.mdl");
-	precache_model ("progs/v_rock.mdl");
-	precache_model ("progs/v_shot2.mdl");
-	precache_model ("progs/v_nail2.mdl");
-	precache_model ("progs/v_rock2.mdl");
+	precache_model ("models/v_axe.mdl");
+	precache_model ("models/v_shot.mdl");
+	precache_model ("models/v_nail.mdl");
+	precache_model ("models/v_rock.mdl");
+	precache_model ("models/v_shot2.mdl");
+	precache_model ("models/v_nail2.mdl");
+	precache_model ("models/v_rock2.mdl");
 
-	precache_model ("progs/bolt.mdl");		// for lightning gun
-	precache_model ("progs/bolt2.mdl");		// for lightning gun
-	precache_model ("progs/bolt3.mdl");		// for boss shock
-	precache_model ("progs/lavaball.mdl");	// for testing
+	precache_model ("models/bolt.mdl");		// for lightning gun
+	precache_model ("models/bolt2.mdl");		// for lightning gun
+	precache_model ("models/bolt3.mdl");		// for boss shock
+	precache_model ("models/lavaball.mdl");	// for testing
 	
-	precache_model ("progs/missile.mdl");
-	precache_model ("progs/grenade.mdl");
-	precache_model ("progs/spike.mdl");
-	precache_model ("progs/s_spike.mdl");
+	precache_model ("models/missile.mdl");
+	precache_model ("models/grenade.mdl");
+	precache_model ("models/spike.mdl");
+	precache_model ("models/s_spike.mdl");
 
-	precache_model ("progs/backpack.mdl");
+	precache_model ("models/backpack.mdl");
 
-	precache_model ("progs/zom_gib.mdl");
+	precache_model ("models/zom_gib.mdl");
 
-	precache_model ("progs/v_light.mdl");
+	precache_model ("models/v_light.mdl");
 	
 
 //

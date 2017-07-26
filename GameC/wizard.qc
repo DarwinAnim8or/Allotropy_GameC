@@ -223,7 +223,7 @@ void() Wiz_FastFire =
 		newmis.velocity = vec*600;
 		newmis.owner = self.owner;
 		newmis.classname = "wizspike";
-		setmodel (newmis, "progs/w_spike.mdl");
+		setmodel (newmis, "models/w_spike.mdl");
 		setsize (newmis, VEC_ORIGIN, VEC_ORIGIN);		
 	}
 
@@ -362,10 +362,10 @@ void() wiz_die =
 	if (self.health < -40)
 	{
 		sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
-		ThrowHead ("progs/h_wizard.mdl", self.health);
-		ThrowGib ("progs/gib2.mdl", self.health);
-		ThrowGib ("progs/gib2.mdl", self.health);
-		ThrowGib ("progs/gib2.mdl", self.health);
+		ThrowHead ("models/h_wizard.mdl", self.health);
+		ThrowGib ("models/gib2.mdl", self.health);
+		ThrowGib ("models/gib2.mdl", self.health);
+		ThrowGib ("models/gib2.mdl", self.health);
 		return;
 	}
 
@@ -397,9 +397,9 @@ void() monster_wizard =
 		remove(self);
 		return;
 	}
-	precache_model ("progs/wizard.mdl");
-	precache_model ("progs/h_wizard.mdl");
-	precache_model ("progs/w_spike.mdl");
+	precache_model ("models/wizard.mdl");
+	precache_model ("models/h_wizard.mdl");
+	precache_model ("models/w_spike.mdl");
 
 	precache_sound ("wizard/hit.wav");		// used by c code
 	precache_sound ("wizard/wattack.wav");
@@ -412,7 +412,7 @@ void() monster_wizard =
 	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_STEP;
 
-	setmodel (self, "progs/wizard.mdl");
+	setmodel (self, "models/wizard.mdl");
 
 	setsize (self, '-16 -16 -24', '16 16 40');
 	self.health = 80;

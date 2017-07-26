@@ -102,7 +102,7 @@ void(vector org, vector vec) LaunchLaser =
 	newmis.solid = SOLID_BBOX;
 	newmis.effects = EF_DIMLIGHT;
 
-	setmodel (newmis, "progs/laser.mdl");
+	setmodel (newmis, "models/laser.mdl");
 	setsize (newmis, '0 0 0', '0 0 0');		
 
 	setorigin (newmis, org);
@@ -307,10 +307,10 @@ void() enf_die =
 	if (self.health < -35)
 	{
 		sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
-		ThrowHead ("progs/h_mega.mdl", self.health);
-		ThrowGib ("progs/gib1.mdl", self.health);
-		ThrowGib ("progs/gib2.mdl", self.health);
-		ThrowGib ("progs/gib3.mdl", self.health);
+		ThrowHead ("models/h_mega.mdl", self.health);
+		ThrowGib ("models/gib1.mdl", self.health);
+		ThrowGib ("models/gib2.mdl", self.health);
+		ThrowGib ("models/gib3.mdl", self.health);
 		return;
 	}
 
@@ -333,9 +333,9 @@ void() monster_enforcer =
 		remove(self);
 		return;
 	}
-	precache_model2 ("progs/enforcer.mdl");
-	precache_model2 ("progs/h_mega.mdl");
-	precache_model2 ("progs/laser.mdl");
+	precache_model2 ("models/enforcer.mdl");
+	precache_model2 ("models/h_mega.mdl");
+	precache_model2 ("models/laser.mdl");
 
 	precache_sound2 ("enforcer/death1.wav");
 	precache_sound2 ("enforcer/enfire.wav");
@@ -351,7 +351,7 @@ void() monster_enforcer =
 	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_STEP;
 
-	setmodel (self, "progs/enforcer.mdl");
+	setmodel (self, "models/enforcer.mdl");
 
 	setsize (self, '-16 -16 -24', '16 16 40');
 	self.health = 80;

@@ -121,10 +121,10 @@ void() shalrath_die =
 	if (self.health < -90)
 	{
 		sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
-		ThrowHead ("progs/h_shal.mdl", self.health);
-		ThrowGib ("progs/gib1.mdl", self.health);
-		ThrowGib ("progs/gib2.mdl", self.health);
-		ThrowGib ("progs/gib3.mdl", self.health);
+		ThrowHead ("models/h_shal.mdl", self.health);
+		ThrowGib ("models/gib1.mdl", self.health);
+		ThrowGib ("models/gib2.mdl", self.health);
+		ThrowGib ("models/gib3.mdl", self.health);
 		return;
 	}
 
@@ -161,7 +161,7 @@ void() ShalMissile =
 
 	missile.solid = SOLID_BBOX;
 	missile.movetype = MOVETYPE_FLYMISSILE;
-	setmodel (missile, "progs/v_spike.mdl");
+	setmodel (missile, "models/v_spike.mdl");
 
 	setsize (missile, '0 0 0', '0 0 0');		
 
@@ -210,7 +210,7 @@ void() ShalMissileTouch =
 
 	self.velocity = '0 0 0';
 	self.touch = SUB_Null;
-	setmodel (self, "progs/s_explod.spr");
+	setmodel (self, "models/s_explod.spr");
 	self.solid = SOLID_NOT;
 	s_explode1 ();
 };
@@ -226,9 +226,9 @@ void() monster_shalrath =
 		remove(self);
 		return;
 	}
-	precache_model2 ("progs/shalrath.mdl");
-	precache_model2 ("progs/h_shal.mdl");
-	precache_model2 ("progs/v_spike.mdl");
+	precache_model2 ("models/shalrath.mdl");
+	precache_model2 ("models/h_shal.mdl");
+	precache_model2 ("models/v_spike.mdl");
 	
 	precache_sound2 ("shalrath/attack.wav");
 	precache_sound2 ("shalrath/attack2.wav");
@@ -240,7 +240,7 @@ void() monster_shalrath =
 	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_STEP;
 	
-	setmodel (self, "progs/shalrath.mdl");
+	setmodel (self, "models/shalrath.mdl");
 	setsize (self, VEC_HULL2_MIN, VEC_HULL2_MAX);
 	self.health = 400;
 

@@ -310,8 +310,8 @@ void() armor_touch =
 void() item_armor1 =
 {
 	self.touch = armor_touch;
-	precache_model ("progs/armor.mdl");
-	setmodel (self, "progs/armor.mdl");
+	precache_model ("models/armor.mdl");
+	setmodel (self, "models/armor.mdl");
 	self.skin = 0;
 	setsize (self, '-16 -16 0', '16 16 56');
 	StartItem ();
@@ -323,8 +323,8 @@ void() item_armor1 =
 void() item_armor2 =
 {
 	self.touch = armor_touch;
-	precache_model ("progs/armor.mdl");
-	setmodel (self, "progs/armor.mdl");
+	precache_model ("models/armor.mdl");
+	setmodel (self, "models/armor.mdl");
 	self.skin = 1;
 	setsize (self, '-16 -16 0', '16 16 56');
 	StartItem ();
@@ -336,8 +336,8 @@ void() item_armor2 =
 void() item_armorInv =
 {
 	self.touch = armor_touch;
-	precache_model ("progs/armor.mdl");
-	setmodel (self, "progs/armor.mdl");
+	precache_model ("models/armor.mdl");
+	setmodel (self, "models/armor.mdl");
 	self.skin = 2;
 	setsize (self, '-16 -16 0', '16 16 56');
 	StartItem ();
@@ -543,8 +543,8 @@ void() weapon_touch =
 
 void() weapon_supershotgun =
 {
-	precache_model ("progs/g_shot.mdl");
-	setmodel (self, "progs/g_shot.mdl");
+	precache_model ("models/g_shot.mdl");
+	setmodel (self, "models/g_shot.mdl");
 	self.weapon = IT_SUPER_SHOTGUN;
 	self.netname = "Double-barrelled Shotgun";
 	self.touch = weapon_touch;
@@ -557,8 +557,8 @@ void() weapon_supershotgun =
 
 void() weapon_nailgun =
 {
-	precache_model ("progs/g_nail.mdl");
-	setmodel (self, "progs/g_nail.mdl");
+	precache_model ("models/g_nail.mdl");
+	setmodel (self, "models/g_nail.mdl");
 	self.weapon = IT_NAILGUN;
 	self.netname = "nailgun";
 	self.touch = weapon_touch;
@@ -571,8 +571,8 @@ void() weapon_nailgun =
 
 void() weapon_supernailgun =
 {
-	precache_model ("progs/g_nail2.mdl");
-	setmodel (self, "progs/g_nail2.mdl");
+	precache_model ("models/g_nail2.mdl");
+	setmodel (self, "models/g_nail2.mdl");
 	self.weapon = IT_SUPER_NAILGUN;
 	self.netname = "Super Nailgun";
 	self.touch = weapon_touch;
@@ -585,8 +585,8 @@ void() weapon_supernailgun =
 
 void() weapon_grenadelauncher =
 {
-	precache_model ("progs/g_rock.mdl");
-	setmodel (self, "progs/g_rock.mdl");
+	precache_model ("models/g_rock.mdl");
+	setmodel (self, "models/g_rock.mdl");
 	self.weapon = 3;
 	self.netname = "Grenade Launcher";
 	self.touch = weapon_touch;
@@ -599,8 +599,8 @@ void() weapon_grenadelauncher =
 
 void() weapon_rocketlauncher =
 {
-	precache_model ("progs/g_rock2.mdl");
-	setmodel (self, "progs/g_rock2.mdl");
+	precache_model ("models/g_rock2.mdl");
+	setmodel (self, "models/g_rock2.mdl");
 	self.weapon = 3;
 	self.netname = "Rocket Launcher";
 	self.touch = weapon_touch;
@@ -614,8 +614,8 @@ void() weapon_rocketlauncher =
 
 void() weapon_lightning =
 {
-	precache_model ("progs/g_light.mdl");
-	setmodel (self, "progs/g_light.mdl");
+	precache_model ("models/g_light.mdl");
+	setmodel (self, "models/g_light.mdl");
 	self.weapon = 3;
 	self.netname = "Thunderbolt";
 	self.touch = weapon_touch;
@@ -968,20 +968,20 @@ void() item_key1 =
 {
 	if (world.worldtype == 0)
 	{
-		precache_model ("progs/w_s_key.mdl");
-		setmodel (self, "progs/w_s_key.mdl");
+		precache_model ("models/w_s_key.mdl");
+		setmodel (self, "models/w_s_key.mdl");
 		self.netname = "silver key";
 	}
 	else if (world.worldtype == 1)
 	{
-		precache_model ("progs/m_s_key.mdl");
-		setmodel (self, "progs/m_s_key.mdl");
+		precache_model ("models/m_s_key.mdl");
+		setmodel (self, "models/m_s_key.mdl");
 		self.netname = "silver runekey";
 	}
 	else if (world.worldtype == 2)
 	{
-		precache_model2 ("progs/b_s_key.mdl");
-		setmodel (self, "progs/b_s_key.mdl");
+		precache_model2 ("models/b_s_key.mdl");
+		setmodel (self, "models/b_s_key.mdl");
 		self.netname = "silver keycard";
 	}
 	key_setsounds();
@@ -1006,20 +1006,20 @@ void() item_key2 =
 {
 	if (world.worldtype == 0)
 	{
-		precache_model ("progs/w_g_key.mdl");
-		setmodel (self, "progs/w_g_key.mdl");
+		precache_model ("models/w_g_key.mdl");
+		setmodel (self, "models/w_g_key.mdl");
 		self.netname = "gold key";
 	}
 	if (world.worldtype == 1)
 	{
-		precache_model ("progs/m_g_key.mdl");
-		setmodel (self, "progs/m_g_key.mdl");
+		precache_model ("models/m_g_key.mdl");
+		setmodel (self, "models/m_g_key.mdl");
 		self.netname = "gold runekey";
 	}
 	if (world.worldtype == 2)
 	{
-		precache_model2 ("progs/b_g_key.mdl");
-		setmodel (self, "progs/b_g_key.mdl");
+		precache_model2 ("models/b_g_key.mdl");
+		setmodel (self, "models/b_g_key.mdl");
 		self.netname = "gold keycard";
 	}
 	key_setsounds();
@@ -1075,23 +1075,23 @@ void() item_sigil =
 
 	if (self.spawnflags & 1)
 	{
-		precache_model ("progs/end1.mdl");
-		setmodel (self, "progs/end1.mdl");
+		precache_model ("models/end1.mdl");
+		setmodel (self, "models/end1.mdl");
 	}
 	if (self.spawnflags & 2)
 	{
-		precache_model2 ("progs/end2.mdl");
-		setmodel (self, "progs/end2.mdl");
+		precache_model2 ("models/end2.mdl");
+		setmodel (self, "models/end2.mdl");
 	}
 	if (self.spawnflags & 4)
 	{
-		precache_model2 ("progs/end3.mdl");
-		setmodel (self, "progs/end3.mdl");
+		precache_model2 ("models/end3.mdl");
+		setmodel (self, "models/end3.mdl");
 	}
 	if (self.spawnflags & 8)
 	{
-		precache_model2 ("progs/end4.mdl");
-		setmodel (self, "progs/end4.mdl");
+		precache_model2 ("models/end4.mdl");
+		setmodel (self, "models/end4.mdl");
 	}
 	
 	self.touch = sigil_touch;
@@ -1179,12 +1179,12 @@ void() item_artifact_invulnerability =
 {
 	self.touch = powerup_touch;
 
-	precache_model ("progs/invulner.mdl");
+	precache_model ("models/invulner.mdl");
 	precache_sound ("items/protect.wav");
 	precache_sound ("items/protect2.wav");
 	precache_sound ("items/protect3.wav");
 	self.noise = "items/protect.wav";
-	setmodel (self, "progs/invulner.mdl");
+	setmodel (self, "models/invulner.mdl");
 	self.netname = "Pentagram of Protection";
 	self.items = IT_INVULNERABILITY;
 	setsize (self, '-16 -16 -24', '16 16 32');
@@ -1198,11 +1198,11 @@ void() item_artifact_envirosuit =
 {
 	self.touch = powerup_touch;
 
-	precache_model ("progs/suit.mdl");
+	precache_model ("models/suit.mdl");
 	precache_sound ("items/suit.wav");
 	precache_sound ("items/suit2.wav");
 	self.noise = "items/suit.wav";
-	setmodel (self, "progs/suit.mdl");
+	setmodel (self, "models/suit.mdl");
 	self.netname = "Biosuit";
 	self.items = IT_SUIT;
 	setsize (self, '-16 -16 -24', '16 16 32');
@@ -1217,12 +1217,12 @@ void() item_artifact_invisibility =
 {
 	self.touch = powerup_touch;
 
-	precache_model ("progs/invisibl.mdl");
+	precache_model ("models/invisibl.mdl");
 	precache_sound ("items/inv1.wav");
 	precache_sound ("items/inv2.wav");
 	precache_sound ("items/inv3.wav");
 	self.noise = "items/inv1.wav";
-	setmodel (self, "progs/invisibl.mdl");
+	setmodel (self, "models/invisibl.mdl");
 	self.netname = "Ring of Shadows";
 	self.items = IT_INVISIBILITY;
 	setsize (self, '-16 -16 -24', '16 16 32');
@@ -1237,12 +1237,12 @@ void() item_artifact_super_damage =
 {
 	self.touch = powerup_touch;
 
-	precache_model ("progs/quaddama.mdl");
+	precache_model ("models/quaddama.mdl");
 	precache_sound ("items/damage.wav");
 	precache_sound ("items/damage2.wav");
 	precache_sound ("items/damage3.wav");
 	self.noise = "items/damage.wav";
-	setmodel (self, "progs/quaddama.mdl");
+	setmodel (self, "models/quaddama.mdl");
 	self.netname = "Quad Damage";
 	self.items = IT_QUAD;
 	setsize (self, '-16 -16 -24', '16 16 32');
@@ -1485,7 +1485,7 @@ void() DropBackpack =
 	item.flags = FL_ITEM;
 	item.solid = SOLID_TRIGGER;
 	item.movetype = MOVETYPE_TOSS;
-	setmodel (item, "progs/backpack.mdl");
+	setmodel (item, "models/backpack.mdl");
 	setsize (item, '-16 -16 0', '16 16 56');
 	item.touch = BackpackTouch;
 	

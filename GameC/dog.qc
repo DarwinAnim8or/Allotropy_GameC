@@ -250,10 +250,10 @@ void() dog_die =
 	if (self.health < -35)
 	{
 		sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
-		ThrowGib ("progs/gib3.mdl", self.health);
-		ThrowGib ("progs/gib3.mdl", self.health);
-		ThrowGib ("progs/gib3.mdl", self.health);
-		ThrowHead ("progs/h_dog.mdl", self.health);
+		ThrowGib ("models/gib3.mdl", self.health);
+		ThrowGib ("models/gib3.mdl", self.health);
+		ThrowGib ("models/gib3.mdl", self.health);
+		ThrowHead ("models/h_dog.mdl", self.health);
 		return;
 	}
 
@@ -350,8 +350,8 @@ void() monster_dog =
 		remove(self);
 		return;
 	}
-	precache_model ("progs/h_dog.mdl");
-	precache_model ("progs/dog.mdl");
+	precache_model ("models/h_dog.mdl");
+	precache_model ("models/dog.mdl");
 
 	precache_sound ("dog/dattack1.wav");
 	precache_sound ("dog/ddeath.wav");
@@ -362,7 +362,7 @@ void() monster_dog =
 	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_STEP;
 
-	setmodel (self, "progs/dog.mdl");
+	setmodel (self, "models/dog.mdl");
 
 	setsize (self, '-32 -32 -24', '32 32 40');
 	self.health = 25;

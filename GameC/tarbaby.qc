@@ -213,7 +213,7 @@ void() monster_tarbaby =
 		remove(self);
 		return;
 	}
-	precache_model2 ("progs/tarbaby.mdl");
+	precache_model2 ("models/tarbaby.mdl");
 
 	precache_sound2 ("blob/death1.wav");
 	precache_sound2 ("blob/hit1.wav");
@@ -223,7 +223,7 @@ void() monster_tarbaby =
 	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_STEP;
 
-	setmodel (self, "progs/tarbaby.mdl");
+	setmodel (self, "models/tarbaby.mdl");
 
 	setsize (self, '-16 -16 -24', '16 16 40');
 	self.health = 80;

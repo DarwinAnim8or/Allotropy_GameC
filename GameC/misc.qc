@@ -118,8 +118,8 @@ Default style is 0
 */
 void() light_globe =
 {
-	precache_model ("progs/s_light.spr");
-	setmodel (self, "progs/s_light.spr");
+	precache_model ("models/s_light.spr");
+	setmodel (self, "models/s_light.spr");
 	makestatic (self);
 };
 
@@ -137,8 +137,8 @@ Default style is 0
 */
 void() light_torch_small_walltorch =
 {
-	precache_model ("progs/flame.mdl");
-	setmodel (self, "progs/flame.mdl");
+	precache_model ("models/flame.mdl");
+	setmodel (self, "models/flame.mdl");
 	FireAmbient ();
 	makestatic (self);
 };
@@ -148,8 +148,8 @@ Large yellow flame ball
 */
 void() light_flame_large_yellow =
 {
-	precache_model ("progs/flame2.mdl");
-	setmodel (self, "progs/flame2.mdl");
+	precache_model ("models/flame2.mdl");
+	setmodel (self, "models/flame2.mdl");
 	self.frame = 1;
 	FireAmbient ();
 	makestatic (self);
@@ -160,8 +160,8 @@ Small yellow flame ball
 */
 void() light_flame_small_yellow =
 {
-	precache_model ("progs/flame2.mdl");
-	setmodel (self, "progs/flame2.mdl");
+	precache_model ("models/flame2.mdl");
+	setmodel (self, "models/flame2.mdl");
 	FireAmbient ();
 	makestatic (self);
 };
@@ -171,8 +171,8 @@ Small white flame ball
 */
 void() light_flame_small_white =
 {
-	precache_model ("progs/flame2.mdl");
-	setmodel (self, "progs/flame2.mdl");
+	precache_model ("models/flame2.mdl");
+	setmodel (self, "models/flame2.mdl");
 	FireAmbient ();
 	makestatic (self);
 };
@@ -189,7 +189,7 @@ void() fire_touch;
 void() misc_fireball =
 {
 	
-	precache_model ("progs/lavaball.mdl");
+	precache_model ("models/lavaball.mdl");
 	self.classname = "fireball";
 	self.nextthink = time + (random() * 5);
 	self.think = fire_fly;
@@ -209,7 +209,7 @@ local entity	fireball;
 	fireball.velocity_y = (random() * 100) - 50;
 	fireball.velocity_z = self.speed + (random() * 200);
 	fireball.classname = "fireball";
-	setmodel (fireball, "progs/lavaball.mdl");
+	setmodel (fireball, "models/lavaball.mdl");
 	setsize (fireball, '0 0 0', '0 0 0');
 	setorigin (fireball, self.origin);
 	fireball.nextthink = time + 5;
@@ -349,7 +349,7 @@ void() trap_spikeshooter =
 	self.use = spikeshooter_use;
 	if (self.spawnflags & SPAWNFLAG_LASER)
 	{
-		precache_model2 ("progs/laser.mdl");
+		precache_model2 ("models/laser.mdl");
 		
 		precache_sound2 ("enforcer/enfire.wav");
 		precache_sound2 ("enforcer/enfstop.wav");
@@ -401,7 +401,7 @@ void() air_bubbles =
 		remove (self);
 		return;
 	}
-	precache_model ("progs/s_bubble.spr");
+	precache_model ("models/s_bubble.spr");
 	self.nextthink = time + 1;
 	self.think = make_bubbles;
 };
@@ -411,7 +411,7 @@ void() make_bubbles =
 local entity	bubble;
 
 	bubble = spawn();
-	setmodel (bubble, "progs/s_bubble.spr");
+	setmodel (bubble, "models/s_bubble.spr");
 	setorigin (bubble, self.origin);
 	bubble.movetype = MOVETYPE_NOCLIP;
 	bubble.solid = SOLID_NOT;
@@ -431,7 +431,7 @@ void() bubble_split =
 {
 local entity	bubble;
 	bubble = spawn();
-	setmodel (bubble, "progs/s_bubble.spr");
+	setmodel (bubble, "models/s_bubble.spr");
 	setorigin (bubble, self.origin);
 	bubble.movetype = MOVETYPE_NOCLIP;
 	bubble.solid = SOLID_NOT;
@@ -509,8 +509,8 @@ void() viewthing =
 {
 	self.movetype = MOVETYPE_NONE;
 	self.solid = SOLID_NOT;
-	precache_model ("progs/player.mdl");
-	setmodel (self, "progs/player.mdl");
+	precache_model ("models/player.mdl");
+	setmodel (self, "models/player.mdl");
 };
 
 

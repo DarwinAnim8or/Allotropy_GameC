@@ -174,10 +174,10 @@ void() demon_die =
 	if (self.health < -80)
 	{
 		sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
-		ThrowHead ("progs/h_demon.mdl", self.health);
-		ThrowGib ("progs/gib1.mdl", self.health);
-		ThrowGib ("progs/gib1.mdl", self.health);
-		ThrowGib ("progs/gib1.mdl", self.health);
+		ThrowHead ("models/h_demon.mdl", self.health);
+		ThrowGib ("models/gib1.mdl", self.health);
+		ThrowGib ("models/gib1.mdl", self.health);
+		ThrowGib ("models/gib1.mdl", self.health);
 		return;
 	}
 
@@ -202,8 +202,8 @@ void() monster_demon1 =
 		remove(self);
 		return;
 	}
-	precache_model ("progs/demon.mdl");
-	precache_model ("progs/h_demon.mdl");
+	precache_model ("models/demon.mdl");
+	precache_model ("models/h_demon.mdl");
 
 	precache_sound ("demon/ddeath.wav");
 	precache_sound ("demon/dhit2.wav");
@@ -215,7 +215,7 @@ void() monster_demon1 =
 	self.solid = SOLID_SLIDEBOX;
 	self.movetype = MOVETYPE_STEP;
 
-	setmodel (self, "progs/demon.mdl");
+	setmodel (self, "models/demon.mdl");
 
 	setsize (self, VEC_HULL2_MIN, VEC_HULL2_MAX);
 	self.health = 300;
