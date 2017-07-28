@@ -202,6 +202,7 @@ void() worldspawn =
 
 // player precaches	
 	W_Precache ();			// get weapon precaches
+	I_Precache();			// precache the weapon drops
 
 // sounds used from C physics code
 	precache_sound ("demon/dland2.wav");		// landing thud
@@ -309,6 +310,7 @@ void() worldspawn =
 
 //
 // Setup light animation tables. 'a' is total darkness, 'z' is maxbright.
+// GieV: this is hilarious. I didn't see the comment above at first which made me wonder why this is here.
 //
 
 	// 0 normal

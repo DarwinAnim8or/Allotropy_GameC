@@ -20,6 +20,16 @@ void() W_SetCurrentAmmo;
 /* ALL LIGHTS SHOULD BE 0 1 0 IN COLOR ALL OTHER ITEMS SHOULD
 BE .8 .3 .4 IN COLOR */
 
+void() I_Precache =
+{
+	precache_model ("models/backpack.mdl");
+	precache_model ("models/g_shot.mdl");
+	precache_model ("models/g_nail.mdl");
+	precache_model ("models/g_nail2.mdl");
+	precache_model ("models/g_rock.mdl");
+	precache_model ("models/g_rock2.mdl");
+	precache_model ("models/g_light.mdl");
+};
 
 void() SUB_regen =
 {
@@ -1440,7 +1450,9 @@ void() BackpackTouch =
 
 /*		//copypasta'd directly from gpl'd qw source on github.
 ===============
-DropBackpack
+DropBackpack 
+GieV: Replaced this to drop the actual gun models instead of just backpacks.
+      Code from: http://www.insideqc.com/qctut/qctut-60.shtml (by Marius)
 ===============
 */
 void() DropBackpack =
@@ -1453,7 +1465,7 @@ void() DropBackpack =
 	item = spawn();
 	item.origin = self.origin - '0 0 24';
 	
-	item.items = self.weapon;
+	/*item.items = self.weapon;
 	if (item.items == IT_AXE)
 		item.netname = "Axe";
 	else if (item.items == IT_SHOTGUN)
@@ -1471,24 +1483,84 @@ void() DropBackpack =
 	else if (item.items == IT_LIGHTNING)
 		item.netname = "Thunderbolt";
 	else
-		item.netname = "";
+		item.netname = "";*/
 
-	item.ammo_shells = self.ammo_shells;
+
+	item.items = self.weapon;
+	if (item.items == IT_AXE) {
+		return;		//No point in receiving an Axe ? 
+	}
+	else if (item.items == IT_SHOTGUN) {
+		setmodel (item, "models/backpack.mdl"); //The single barrel shotgun has no ground model, 
+		setsize (item, '-16 -16 0', '16 16 56');
+		item.ammo_shells = self.ammo_shells;
+		item.netname = "Shotgun";
+	}
+	else if (item.items == IT_SUPER_SHOTGUN)
+	{	
+		setmodel (item, "models/g_shot.mdl");
+		setsize (item, '-16 -16 0', '16 16 56');
+		item.ammo_shells = self.ammo_shells;
+		item.netname = "Double-barrelled Shotgun";
+	}
+	else if (item.items == IT_NAILGUN)
+	{	
+		setmodel (item, "models/g_nail.mdl");
+		setsize (item, '-16 -16 0', '16 16 56');	
+		item.ammo_nails = self.ammo_nails;
+		item.netname = "Nailgun";
+	}
+	else if (item.items == IT_SUPER_NAILGUN)
+	{
+		setmodel (item, "models/g_nail2.mdl");
+		setsize (item, '-16 -16 0', '16 16 56');
+		item.ammo_nails = self.ammo_nails;
+		item.netname = "Super Nailgun";
+	}
+	else if (item.items == IT_GRENADE_LAUNCHER)
+	{	
+	
+		setmodel (item, "models/g_rock.mdl");
+		setsize (item, '-16 -16 0', '16 16 56');
+		item.ammo_rockets = self.ammo_rockets;
+		item.netname = "Grenade Launcher";
+	}
+	else if (item.items == IT_ROCKET_LAUNCHER)
+	{
+		setmodel (item, "models/g_rock2.mdl");
+		setsize (item, '-16 -16 0', '16 16 56');
+		item.ammo_rockets = self.ammo_rockets;
+		item.netname = "Rocket Launcher";
+	}
+	else if (item.items == IT_LIGHTNING)
+	{
+		setmodel (item, "models/g_light.mdl");
+		setsize (item, '-16 -16 0', '16 16 56');
+		item.ammo_cells = self.ammo_cells;
+		item.netname = "Thunderbolt";
+	}
+	
+	//GieV: Thinking of using this to make weapon drops more accurate...
+	/*item.ammo_shells = self.ammo_shells;
 	item.ammo_nails = self.ammo_nails;
 	item.ammo_rockets = self.ammo_rockets;
-	item.ammo_cells = self.ammo_cells;
+	item.ammo_cells = self.ammo_cells;*/
 
-	item.velocity_z = 300;
-	item.velocity_x = -100 + (random() * 200);
-	item.velocity_y = -100 + (random() * 200);
+	item.velocity_z = 300; //throw the model 300 units upwards
+	item.velocity_x = -100 + (random() * 200); //randomly throw in the X dir
+	item.velocity_y = -100 + (random() * 200); //randomly throw in the Y dir
 	
 	item.flags = FL_ITEM;
 	item.solid = SOLID_TRIGGER;
 	item.movetype = MOVETYPE_TOSS;
-	setmodel (item, "models/backpack.mdl");
-	setsize (item, '-16 -16 0', '16 16 56');
+	//setmodel (item, "models/backpack.mdl");
+	//setsize (item, '-16 -16 0', '16 16 56');
+
+	
+
 	item.touch = BackpackTouch;
 	
-	item.nextthink = time + 120;    // remove after 2 minutes
+	//GieV: decreased the time from 120 (2 min) to 45 seconds. 
+	item.nextthink = time + 45;    // remove after 45 seconds.
 	item.think = SUB_Remove;
 };
