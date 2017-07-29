@@ -1270,6 +1270,8 @@ void() ImpulseCommands =
 		ServerflagsCommand ();
 	if (self.impulse == 12)
 		CycleWeaponReverseCommand();
+	if (self.impulse == 30)
+		flash_toggle();
 	if (self.impulse == 255)
 		QuadCheat ();
 		

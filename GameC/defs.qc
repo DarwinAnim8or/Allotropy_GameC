@@ -399,6 +399,7 @@ float	EF_BRIGHTFIELD	= 1;
 float	EF_MUZZLEFLASH 	= 2;
 float	EF_BRIGHTLIGHT 	= 4;
 float	EF_DIMLIGHT 	= 8;
+float	EF_FLASHLIGHT	= 16;
 
 
 // messages
@@ -710,3 +711,7 @@ float(entity targ, entity inflictor) CanDamage;
 //GieV: water splash, based on code from: http://www.insideqc.com/qctut/qctut-77.shtml by Tux
 .float waterSplash;
 .float canSplash;
+
+//GieV: flashlight
+.float flash_flag; //Flashlight toggle
+.entity flash; //flashlight entity
