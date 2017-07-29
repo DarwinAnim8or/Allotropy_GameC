@@ -550,6 +550,7 @@ void() PutClientInServer =
 	self.flags = FL_CLIENT;
 	self.air_finished = time + 12;
 	self.dmg = 2;   		// initial water damage
+	self.canSplash = TRUE; 
 	self.super_damage_finished = 0;
 	self.radsuit_finished = 0;
 	self.invisible_finished = 0;
@@ -1293,6 +1294,7 @@ void() PlayerPostThink =
 		self.jump_flag = self.velocity_z;
 
 	CheckPowerups ();
+	CheckSplash();
 };
 
 

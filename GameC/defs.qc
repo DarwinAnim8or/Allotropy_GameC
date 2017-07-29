@@ -707,4 +707,6 @@ float (entity e, float healamount, float ignore) T_Heal; // health function
 
 float(entity targ, entity inflictor) CanDamage;
 
-
+//GieV: water splash, based on code from: http://www.insideqc.com/qctut/qctut-77.shtml by Tux
+.float waterSplash;
+.float canSplash;

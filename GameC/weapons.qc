@@ -40,6 +40,7 @@ void() W_Precache =
 	precache_sound ("weapons/grenade.wav");	// grenade launcher
 	precache_sound ("weapons/bounce.wav");		// grenade bounce
 	precache_sound ("weapons/shotgun.wav");	// super shotgun
+	precache_model ("models/null.spr"); // needed, otherwise the water splash won't work. 
 };
 
 float() crandom =
@@ -420,6 +421,7 @@ void() W_FireRocket =
 	setmodel (missile, "models/missile.mdl");
 	setsize (missile, '0 0 0', '0 0 0');		
 	setorigin (missile, self.origin + v_forward*8 + '0 0 16');
+	self.canSplash = TRUE;
 };
 
 /*
@@ -606,6 +608,7 @@ void() W_FireGrenade =
 	setmodel (missile, "models/grenade.mdl");
 	setsize (missile, '0 0 0', '0 0 0');		
 	setorigin (missile, self.origin);
+	missile.canSplash = TRUE; //make grenades splash when they hit the water
 };
 
 
