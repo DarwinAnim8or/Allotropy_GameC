@@ -133,7 +133,7 @@ void() main =
 	precache_file ("maps/e1m8.bsp");
 
 // registered
-	precache_file2 ("gfx/pop.lmp");
+	precache_file2 ("gui/pop.lmp");
 
 	precache_file2 ("maps/e2m1.bsp");
 	precache_file2 ("maps/e2m2.bsp");
@@ -270,6 +270,8 @@ void() worldspawn =
 
 	precache_sound ("misc/water1.wav");			// swimming
 	precache_sound ("misc/water2.wav");			// swimming
+
+	precache_sound ("buttons/flashlight.wav");	//flashlight toggle sfx
 
 	precache_model ("models/player.mdl");
 	precache_model ("models/eyes.mdl");

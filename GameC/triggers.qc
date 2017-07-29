@@ -380,6 +380,17 @@ void() teleport_touch =
 local entity	t;
 local vector	org;
 
+ 	if (other.teleport_time > time) return;  // Can't teleport before time is up
+
+	//GieV: prevents stuff that spawns near the teleporter from teleporting.
+        if ( (other.classname != "missile") && (other.classname != "grenade") &&
+             (other.classname != "player") && (other.classname != "spike") &&
+             (other.classname != "gib") && (other.classname != "weapon_supershotgun") &&    
+             (other.classname != "weapon_grenadelauncher") && (other.classname != "weapon_supernailgun") &&
+             (other.classname != "weapon_nailgun") && (other.classname != "weapon_lightning") &&
+             (other.classname != "weapon_rocketlauncher") && (other.classname != "") )
+                return;
+
 	if (self.targetname != "")
 	{
 		if (self.nextthink < time)
@@ -387,16 +398,17 @@ local vector	org;
 			return;		// not fired yet
 		}
 	}
-
-	if (self.spawnflags & PLAYER_ONLY)
+	
+	//GieV: commented out to allow non-player objects from passing through.
+	/*if (self.spawnflags & PLAYER_ONLY)
 	{
 		if (other.classname != "player")
 			return;
-	}
+	}*/
 
 // only teleport living creatures
-	if (other.health <= 0 || other.solid != SOLID_SLIDEBOX)
-		return;
+	//if (other.health <= 0 || other.solid != SOLID_SLIDEBOX)
+	//	return;
 
 	SUB_UseTargets ();
 
@@ -415,10 +427,15 @@ local vector	org;
 	spawn_tdeath(t.origin, other);
 
 // move the player and lock him down for a little while
-	if (!other.health)
-	{
+	if (!other.health) {
 		other.origin = t.origin;
-		other.velocity = (v_forward * other.velocity_x) + (v_forward * other.velocity_y);
+		//other.velocity = (v_forward * other.velocity_x) + (v_forward * other.velocity_y);
+
+		if (other.velocity_y < 0) other.velocity_y = other.velocity_y * -1;
+		other.fixangle = 1;             // turn this way immediately
+                other.teleport_time = time + 0.7;
+                other.angles = t.mangle;
+
 		return;
 	}
 
@@ -461,19 +478,18 @@ Any object touching this will be transported to the corresponding info_teleport_
 
 If the trigger_teleport has a targetname, it will only teleport entities when it has been fired.
 */
-void() trigger_teleport =
-{
+void() trigger_teleport = {
 	local vector o;
 
 	InitTrigger ();
+	self.flags = self.flags | FL_ITEM; //GieV: enlarges the tele's trigger.
 	self.touch = teleport_touch;
 	// find the destination 
 	if (!self.target)
 		objerror ("no target");
 	self.use = teleport_use;
 
-	if (!(self.spawnflags & SILENT))
-	{
+	if (!(self.spawnflags & SILENT)) {
 		precache_sound ("ambience/hum1.wav");
 		o = (self.mins + self.maxs)*0.5;
 		ambientsound (o, "ambience/hum1.wav",0.5 , ATTN_STATIC);

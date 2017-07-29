@@ -57,19 +57,17 @@ void() flash_on = {
 
 
 void () flash_toggle = {
-        // If Off, Turn On
-        if (self.flash_flag == FALSE)
-        {       
-                self.flash_flag = TRUE;
-                flash_on();
-        }
+	if (self.flash_flag == FALSE) {       
+		self.flash_flag = TRUE;
+		flash_on();
+		sound(self, CHAN_VOICE, "buttons/flashlight.wav", 1, ATTN_IDLE);
+	}
 
-        // If On, Turn Off
-        else
-        {
-                self.flash_flag = FALSE;
-                W_SetCurrentAmmo ();
-                self.flash.think = SUB_Remove;
-                self.flash.nextthink = time + 0.1;
-        }
+	else {
+		self.flash_flag = FALSE;
+		W_SetCurrentAmmo ();
+		self.flash.think = SUB_Remove;
+		self.flash.nextthink = time + 0.1;
+		sound (self, CHAN_VOICE, "buttons/flashlight.wav", 1, ATTN_IDLE);
+	}
 };
