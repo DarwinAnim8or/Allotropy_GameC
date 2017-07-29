@@ -1453,6 +1453,7 @@ void() BackpackTouch =
 DropBackpack 
 GieV: Replaced this to drop the actual gun models instead of just backpacks.
       Code from: http://www.insideqc.com/qctut/qctut-60.shtml (by Marius)
+      29/07/2017: Patched this to re-add backpacks for singleplayer. 
 ===============
 */
 void() DropBackpack =
@@ -1538,6 +1539,15 @@ void() DropBackpack =
 		setsize (item, '-16 -16 0', '16 16 56');
 		item.ammo_cells = self.ammo_cells;
 		item.netname = "Thunderbolt";
+	}
+	else {
+		//GieV: patch to make mobs (singleplayer, mostly) spawn backpacks again, otherwise they won't drop anything at all.
+		setmodel (item, "models/backpack.mdl");
+		setsize (item, '-16 -16 0', '16 16 56');
+		item.ammo_shells = self.ammo_shells;
+		item.ammo_nails = self.ammo_nails;
+		item.ammo_rockets = self.ammo_rockets;
+		item.ammo_cells = self.ammo_cells;
 	}
 	
 	//GieV: Thinking of using this to make weapon drops more accurate...
