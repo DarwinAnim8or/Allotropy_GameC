@@ -423,3 +423,26 @@ float() OgreCheckAttack =
 	return TRUE;
 };
 
+//GieV: This is taken from another tutorial, http://www.insideqc.com/qctut/qctut-21.shtml
+//	By 'legion'. This is for making enemies move whilst shooting, making them harder.
+void(float dist) monster_movetogoal = {
+	local float ofs;
+
+	if (vlen(self.enemy.origin - self.origin) > 180) {
+		movetogoal(dist);
+		return;
+	}
+
+	if (self.lefty) {
+		ofs = 90;
+	} else {
+		ofs = -90;
+	}
+
+	if (walkmove(self.angles_y + ofs, dist)) {
+		return;
+	}
+
+	self.lefty = 1 - self.lefty;
+	walkmove(self.angles_y - ofs, dist);
+};

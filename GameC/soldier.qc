@@ -112,7 +112,7 @@ void()	army_run6	=[	$run6,		army_run7	] {ai_run(15);};
 void()	army_run7	=[	$run7,		army_run8	] {ai_run(10);};
 void()	army_run8	=[	$run8,		army_run1	] {ai_run(8);};
 
-void()	army_atk1	=[	$shoot1,	army_atk2	] {ai_face();};
+void()	army_atk1	=[	$shoot1,	army_atk2	] {ai_face(); monster_movetogoal(15); };
 void()	army_atk2	=[	$shoot2,	army_atk3	] {ai_face();};
 void()	army_atk3	=[	$shoot3,	army_atk4	] {ai_face();};
 void()	army_atk4	=[	$shoot4,	army_atk5	] {ai_face();};
@@ -121,7 +121,7 @@ self.effects = self.effects | EF_MUZZLEFLASH;};
 void()	army_atk6	=[	$shoot6,	army_atk7	] {ai_face();};
 void()	army_atk7	=[	$shoot7,	army_atk8	] {ai_face();SUB_CheckRefire (army_atk1);};
 void()	army_atk8	=[	$shoot8,	army_atk9	] {ai_face();};
-void()	army_atk9	=[	$shoot9,	army_run1	] {ai_face();};
+void()	army_atk9	=[	$shoot9,	army_run1	] {ai_face(); monster_movetogoal(15); };
 
 
 void()	army_pain1	=[	$pain1,		army_pain2	] {};
@@ -190,21 +190,32 @@ void(entity attacker, float damage)	army_pain =
 };
 
 
-void() army_fire =
-{
-	local	vector	dir;
-	local	entity	en;
-	
-	ai_face();
-	
-	sound (self, CHAN_WEAPON, "soldier/sattck1.wav", 1, ATTN_NORM);	
+void() army_fire = {
+	local vector   dir;
+        local entity   en;
 
-// fire somewhat behind the player, so a dodging player is harder to hit
-	en = self.enemy;
-	
-	dir = en.origin - en.velocity*0.2;
-	dir = normalize (dir - self.origin);
-	
+        ai_face ();
+
+        sound (self, CHAN_WEAPON, "soldier/sattck1.wav", 1, ATTN_NORM);
+
+        en = self.enemy; // fire somewhat behind the player, so a dodging player is harder to hit
+
+        dir = en.origin - self.origin; // * 0.2; // inaccuracy
+        dir = normalize (dir);
+
+        self.v_angle = vectoangles (dir);
+
+        if (self.v_angle_x > 180)
+           self.v_angle_x = self.v_angle_x - 360; // corrects an ID mistake
+
+        self.v_angle_x = self.v_angle_x * -1;     // corrects an ID mistake
+
+        if (self.v_angle_x > 80)
+           self.v_angle_x = 80;
+
+        if (self.v_angle_x < -80)
+           self.v_angle_x = -80;
+
 	FireBullets (4, dir, '0.1 0.1 0');
 };
 
