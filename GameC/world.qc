@@ -204,10 +204,12 @@ void() worldspawn = {
 // sounds used from C physics code
     precache_sound ("demon/dland2.wav");		// landing thud
     precache_sound ("misc/h2ohit1.wav");		// landing splash
+    precache_sound ("zombie/z_miss.wav");		// for head kicking sfx
+    precache_sound ("zombie/z_hit.wav");		// for head kicking sfx
 
 // setup precaches allways needed
     precache_sound ("items/itembk2.wav");		// item respawn sound
-    precache_sound ("player/plyrjmp8.wav");		// player jump
+    precache_sound ("player/jump.wav");			// player jump
     precache_sound ("player/land.wav");			// player landing
     precache_sound ("player/land2.wav");		// player hurt landing
     precache_sound ("player/drown1.wav");		// drowning pain
@@ -392,6 +394,9 @@ void() InitBodyQue = {
 // make a body que entry for the given ent so the ent can be
 // respawned elsewhere
 void(entity ent) CopyToBodyQue = {
+    bodyque_head.touch = ent.touch; //kicking heads
+    bodyque_head.solid = ent.solid; //kicking heads
+
     bodyque_head.angles = ent.angles;
     bodyque_head.model = ent.model;
     bodyque_head.modelindex = ent.modelindex;

@@ -29,6 +29,7 @@ combat.qc
 items.qc
 splat.qc
 blood.qc
+kickgibs.qc
 weapons.qc
 splash.qc
 world.qc
