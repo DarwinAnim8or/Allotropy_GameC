@@ -2,7 +2,6 @@
 */
 void() deathball_touch;
 
-void() item_deathball =
-{	
-	self.touch = deathball_touch;
+void() item_deathball = {
+    self.touch = deathball_touch;
 };
