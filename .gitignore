@@ -1,4 +1,5 @@
 ﻿*.o
 qcc
+frikqcc
 *.dat
 *.log

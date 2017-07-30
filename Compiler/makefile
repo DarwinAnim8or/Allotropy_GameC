@@ -1,28 +1,18 @@
+#
+# Frikqcc makefile
+#
 
-CFLAGS = -g -Wall
 
-EXES = qcc
+PROG=		frikqcc
+CDEFS=		-DINLINE 
+CWARN=		-Wall -W
+CFLAGS= 	-O2 $(CWARN) $(CDEFS)
+OBJFILES=	cmdlib.o pr_comp.o pr_lex.o qcc.o hash.o main.o
 
-all: $(EXES)
+all:	$(PROG)
 
-install:
-	make app
-	cp $(EXES) /LocalApps
-
-app:
-	make "CFLAGS = -O4 -g -Wall -arch i386 -arch hppa"
-
-debug:
-	make "CFLAGS = -g -Wall"
-
-profile:
-	make "CFLAGS = -pg -Wall"
+$(PROG): $(OBJFILES)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $(PROG) $(OBJFILES) $(LIBS)
 
 clean:
-	rm -f *.o $(EXES)
-
-.c.o: ; cc -c $(CFLAGS) -o $@ $*.c
-
-QCCFILES = qcc.o pr_lex.o pr_comp.o cmdlib.o
-qcc : $(QCCFILES)
-	cc $(CFLAGS) -o qcc $(QCCFILES)
+	rm -rf $(PROG) $(OBJFILES) *.bak *~ make.log error.log

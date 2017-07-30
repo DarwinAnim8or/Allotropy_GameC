@@ -1,27 +1,19 @@
-/*  Copyright (C) 1996-1997  Id Software, Inc.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-
-    See file, 'COPYING', for details.
-*/
 // cmdlib.c
 
 #include "cmdlib.h"
-#include <sys/time.h>
+#include "qcc.h"
 
-#define PATHSEPERATOR   '/'
+#ifdef WIN32
+#ifdef WIN32GUI
+#include <windows.h>
+#endif
+
+#else
+#include <sys/time.h>
+#endif
+
+#define PATHSEPERATOR   '\\'
+
 
 // set these before calling CheckParm
 int myargc;
@@ -29,27 +21,42 @@ char **myargv;
 
 char	com_token[1024];
 int		com_eof;
+/*
+============
+va
 
+does a varargs printf into a temp buffer, so I don't need to have
+varargs versions of all text functions.
+FIXME: make this buffer size safe someday
+============
+*/
+char    *va(char *format, ...)
+{
+	va_list         argptr;
+	static char             string[1024];
+	
+	va_start (argptr, format);
+	vsprintf (string, format,argptr);
+	va_end (argptr);
+
+	return string;
+}
 /*
 ================
 I_FloatTime
 ================
 */
-double I_FloatTime (void)
-{
-	struct timeval tp;
-	struct timezone tzp;
-	static int		secbase;
+#include <time.h>
 
-	gettimeofday(&tp, &tzp);
+time_t I_FloatTime (void)
+{
+    time_t t;
+
+    time(&t);
 	
-	if (!secbase)
-	{
-		secbase = tp.tv_sec;
-		return tp.tv_usec/1000000.0;
-	}
-	
-	return (tp.tv_sec - secbase) + tp.tv_usec/1000000.0;
+    return t;
+
+
 }
 
 
@@ -88,10 +95,27 @@ skipwhite:
 	{
 		while (*data && *data != '\n')
 			data++;
+		if (!*data)
+		{
+			com_eof = true;
+			return NULL;			// end of file;
+		}
 		goto skipwhite;
 	}
-	
-
+// skip /* */ comments
+	if (c=='/' && data[1] == '*')
+	{
+		data+= 2; // don't fall for /*/
+		while (*data && !(*data == '*' && data[1] == '/'))
+			data++;
+		if (!*data)
+		{
+			com_eof = true;
+			return NULL;			// end of file;
+		}
+		data+=2;
+		goto skipwhite;
+	}
 // handle quoted strings specially
 	if (c == '\"')
 	{
@@ -141,13 +165,14 @@ skipwhite:
 filelength
 ================
 */
+#ifndef WIN32
 int filelength (int handle)
 {
 	struct stat	fileinfo;
     
 	if (fstat (handle,&fileinfo) == -1)
 	{
-		Error ("Error fstating");
+		Sys_Error ("Error fstating");
 	}
 
 	return fileinfo.st_size;
@@ -157,6 +182,7 @@ int tell (int handle)
 {
 	return lseek (handle, 0, SEEK_CUR);
 }
+#endif
 
 char *strupr (char *start)
 {
@@ -191,27 +217,77 @@ char *strlower (char *start)
 =============================================================================
 */
 
+#ifdef WIN32GUI
+extern HWND main_hWnd;
+char summary_buf[4096];
+#endif
+
+
+void EndProgram (boolean completed)
+{
+
+	print(" ");
+	print("%s - %i error(s), %i warning(s)", destfile, pr_error_count, pr_warning_count);
+#ifndef WIN32GUI
+	printf("\n");
+	if (!pr_pause)
+		exit(1);
+
+	printf ("press a key\n");
+	getchar();
+	exit(1);
+#else
+	if (completed && summary)
+		MessageBox(main_hWnd, summary_buf, "Summary", MB_OK | MB_SETFOREGROUND | MB_ICONINFORMATION);
+	if (!pr_pause)
+		exit(1);
+#endif
+
+}
+
 /*
 =================
-Error
+Sys_Error
 
 For abnormal program terminations
 =================
 */
-void Error (char *error, ...)
+
+
+void Sys_Error (char *error, ...)
 {
 	va_list argptr;
-
-	printf ("\n************ ERROR ************\n");
-
-	va_start (argptr,error);
-	vprintf (error,argptr);
+	char		text[1024];
+	va_start (argptr, error);
+	vsprintf (text, error,argptr);
 	va_end (argptr);
-	printf ("\n");
-	exit (1);
+#ifdef macintosh
+	Error(text);
+	exit(0);
+#endif
+#ifdef WIN32GUI
+	MessageBox(main_hWnd, text, "FrikQCC Error", MB_OK | MB_SETFOREGROUND | MB_ICONSTOP);
+	exit(0);
+#else
+	print ("************ ERROR ************");
+	print(text);
+	print(" ");
+	EndProgram(false);
+
+#endif
 }
 
-
+int Q_strcmp (char *s1, char *s2)
+{
+	while (*s1 == *s2)
+	{
+		if (!*s1)
+			return 0;               // strings are equal
+		s1+=1;
+		s2+=1;
+	}
+	return -1;
+}
 /*
 =================
 CheckParm
@@ -226,17 +302,16 @@ int CheckParm (char *check)
 
 	for (i = 1;i<myargc;i++)
 	{
-		if ( !strcasecmp(check, myargv[i]) )
+
+		if ( !STRCMP(check, myargv[i]) )
 			return i;
+
 	}
 
 	return 0;
 }
 
 
-#ifndef O_BINARY
-#define O_BINARY 0
-#endif
 
 int SafeOpenWrite (char *filename)
 {
@@ -248,7 +323,7 @@ int SafeOpenWrite (char *filename)
 	, 0666);
 
 	if (handle == -1)
-		Error ("Error opening %s: %s",filename,strerror(errno));
+		Sys_Error ("Error opening %s: %s",filename,strerror(errno));
 
 	return handle;
 }
@@ -259,8 +334,8 @@ int SafeOpenRead (char *filename)
 
 	handle = open(filename,O_RDONLY | O_BINARY);
 
-	if (handle == -1)
-		Error ("Error opening %s: %s",filename,strerror(errno));
+	if (handle <= 0)
+		Sys_Error ("Error opening %s: %s",filename,strerror(errno));
 
 	return handle;
 }
@@ -269,28 +344,16 @@ int SafeOpenRead (char *filename)
 void SafeRead (int handle, void *buffer, long count)
 {
 	if (read (handle,buffer,count) != count)
-		Error ("File read failure");
+		Sys_Error ("File read failure");
 }
 
 
 void SafeWrite (int handle, void *buffer, long count)
 {
 	if (write (handle,buffer,count) != count)
-		Error ("File write failure");
+		Sys_Error ("File write failure");
 }
 
-
-void *SafeMalloc (long size)
-{
-	void *ptr;
-
-	ptr = malloc (size);
-
-	if (!ptr)
-		Error ("Malloc failure for %lu bytes",size);
-
-	return ptr;
-}
 
 
 /*
@@ -306,7 +369,7 @@ long    LoadFile (char *filename, void **bufferptr)
 
 	handle = SafeOpenRead (filename);
 	length = filelength (handle);
-	buffer = SafeMalloc (length+1);
+	buffer = PR_Malloc (length+1);
 	((byte *)buffer)[length] = 0;
 	SafeRead (handle, buffer, length);
 	close (handle);
@@ -390,12 +453,7 @@ void    StripExtension (char *path)
 }
 
 
-/*
-====================
-Extract file parts
-====================
-*/
-void ExtractFilePath (char *path, char *dest)
+void ExtractFilename (char *path, char *dest)
 {
 	char    *src;
 
@@ -404,51 +462,13 @@ void ExtractFilePath (char *path, char *dest)
 //
 // back up until a \ or the start
 //
-	while (src != path && *(src-1) != PATHSEPERATOR)
+	while (src > path && *(src-1) != PATHSEPERATOR)
 		src--;
 
-	memcpy (dest, path, src-path);
-	dest[src-path] = 0;
-}
-
-void ExtractFileBase (char *path, char *dest)
-{
-	char    *src;
-
-	src = path + strlen(path) - 1;
-
-//
-// back up until a \ or the start
-//
-	while (src != path && *(src-1) != PATHSEPERATOR)
-		src--;
-
-	while (*src && *src != '.')
-	{
-		*dest++ = *src++;
-	}
-	*dest = 0;
-}
-
-void ExtractFileExtension (char *path, char *dest)
-{
-	char    *src;
-
-	src = path + strlen(path) - 1;
-
-//
-// back up until a . or the start
-//
-	while (src != path && *(src-1) != '.')
-		src--;
-	if (src == path)
-	{
-		*dest = 0;	// no extension
-		return;
-	}
 
 	strcpy (dest,src);
 }
+
 
 
 /*
@@ -474,7 +494,7 @@ long ParseHex (char *hex)
 		else if (*str >= 'A' && *str <= 'F')
 			num += 10 + *str-'A';
 		else
-			Error ("Bad hex number: %s",hex);
+			Sys_Error ("Bad hex number: %s",hex);
 		str++;
 	}
 
@@ -501,6 +521,8 @@ long ParseNum (char *str)
 ============================================================================
 */
 
+#ifndef INLINE
+
 #ifdef __BIG_ENDIAN__
 
 short   LittleShort (short l)
@@ -517,7 +539,6 @@ short   BigShort (short l)
 {
 	return l;
 }
-
 
 long    LittleLong (long l)
 {
@@ -610,7 +631,6 @@ float	LittleFloat (float l)
 	return l;
 }
 
-
-
 #endif
 
+#endif

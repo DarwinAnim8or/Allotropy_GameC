@@ -1052,10 +1052,11 @@ PlayerPreThink
 Called every frame before physics are run
 ================
 */
-void() PlayerPreThink =
-{
-	if (intermission_running)
-	{
+void() PlayerPreThink = {
+	if (BotPreFrame()) //GieV: FrikBot
+		return;
+
+	if (intermission_running) {
 		IntermissionThink ();	// otherwise a button could be missed between
 		return;					// the think tics
 	}
@@ -1262,8 +1263,10 @@ PlayerPostThink
 Called every frame after physics are run
 ================
 */
-void() PlayerPostThink =
-{
+void() PlayerPostThink = {
+	if (BotPostFrame()) //GieV: FrikBot
+		return;
+
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
 	if (self.deadflag)
@@ -1305,8 +1308,8 @@ ClientConnect
 called when a player connects to a server
 ============
 */
-void() ClientConnect =
-{
+void() ClientConnect = {
+	ClientInRankings(); //GieV: FrikBot
 	bprint (self.netname);
 	bprint (" entered the game\n");
 	
@@ -1323,8 +1326,9 @@ ClientDisconnect
 called when a player disconnects from a server
 ============
 */
-void() ClientDisconnect =
-{
+void() ClientDisconnect = {
+	ClientDisconnected(); //GieV: FrikBot
+
 	if (gameover)
 		return;
 	// if the level end trigger has been activated, just return

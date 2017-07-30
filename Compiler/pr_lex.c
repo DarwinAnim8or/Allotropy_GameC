@@ -1,25 +1,9 @@
-/*  Copyright (C) 1996-1997  Id Software, Inc.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-
-    See file, 'COPYING', for details.
-*/
 
 #include "qcc.h"
+#include "hash.h"
 
-int			pr_source_line;
+
+int		pr_source_line;
 
 char		*pr_file_p;
 char		*pr_line_start;		// start of current source line
@@ -27,17 +11,27 @@ char		*pr_line_start;		// start of current source line
 int			pr_bracelevel;
 
 char		pr_token[2048];
+
 token_type_t	pr_token_type;
 type_t		*pr_immediate_type;
 eval_t		pr_immediate;
+int			pr_immediate_index;
 
 char	pr_immediate_string[2048];
+int		pr_immediate_strlen;
 
 int		pr_error_count;
 
 char	*pr_punctuation[] =
 // longer symbols must be before a shorter partial match
-{"&&", "||", "<=", ">=","==", "!=", ";", ",", "!", "*", "/", "(", ")", "-", "+", "=", "[", "]", "{", "}", "...", ".", "<", ">" , "#" , "&" , "|" , NULL};
+{"&=", "|=", "+=", "-=", "*=", "/=", "--", "++",";", "(", ")", "==", "=", ",", "...", ".", "{", "}",
+"[", "]", "+", "*", "-", "!=", "!", "#", "&&", "&",
+">=", ">", "<=", "<", "||", "|", "/", ":", "@", "?" , NULL};
+
+int	pr_punct_length[] =
+{2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 2, 1, 1, 3, 1, 1, 1,
+1, 1, 1, 1, 1, 2, 1, 1, 2, 1,
+2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 0};
 
 // simple types.  function types are dynamically allocated
 type_t	type_void = {ev_void, &def_void};
@@ -49,10 +43,12 @@ type_t	type_field = {ev_field, &def_field};
 type_t	type_function = {ev_function, &def_function,NULL,&type_void};
 // type_function is a void() function used for state defs
 type_t	type_pointer = {ev_pointer, &def_pointer};
+// type_int -- FrikaC new
+type_t	type_int = {ev_int, &def_int};
 
 type_t	type_floatfield = {ev_field, &def_field, NULL, &type_float};
 
-int		type_size[8] = {1,1,1,3,1,1,1,1};
+int		type_size[9] = {1,1,1,3,1,1,1,1,1};
 
 def_t	def_void = {&type_void, "temp"};
 def_t	def_string = {&type_string, "temp"};
@@ -62,12 +58,18 @@ def_t	def_entity = {&type_entity, "temp"};
 def_t	def_field = {&type_field, "temp"};
 def_t	def_function = {&type_function, "temp"};
 def_t	def_pointer = {&type_pointer, "temp"};
+def_t	def_int = {&type_int, "temp"};
+
 
 def_t	def_ret, def_parms[MAX_PARMS];
 
-def_t	*def_for_type[8] = {&def_void, &def_string, &def_float, &def_vector, &def_entity, &def_field, &def_function, &def_pointer};
+def_t	*def_for_type[9] = {&def_void, &def_string, &def_float, &def_vector, &def_entity, &def_field, &def_function, &def_pointer, &def_int};
 
 void PR_LexWhitespace (void);
+
+define_t	pr_defines[MAX_DEFINES];
+int macrohash[HSIZE1];
+int num_defines;
 
 
 /*
@@ -94,23 +96,12 @@ Call at start of file and when *pr_file_p == '\n'
 */
 void PR_NewLine (void)
 {
-	boolean	m;
-	
+
 	if (*pr_file_p == '\n')
-	{
-		pr_file_p++;
-		m = true;
-	}
+		pr_line_start = pr_file_p + 1;
 	else
-		m = false;
-
+		pr_line_start = pr_file_p;
 	pr_source_line++;
-	pr_line_start = pr_file_p;
-
-//	if (pr_dumpasm)
-//		PR_PrintNextLine ();
-	if (m)
-		pr_file_p--;
 }
 
 /*
@@ -123,39 +114,105 @@ Parses a quoted string
 void PR_LexString (void)
 {
 	int		c;
-	int		len;
+	int mask1 = 0;
+	int mask2;
 	
-	len = 0;
+	pr_immediate_strlen = 0;
 	pr_file_p++;
 	do
 	{
+
+		mask2 = 128;
 		c = *pr_file_p++;
 		if (!c)
 			PR_ParseError ("EOF inside quote");
 		if (c=='\n')
 			PR_ParseError ("newline inside quote");
+		if (c == '\r')
+			continue;
 		if (c=='\\')
 		{	// escape char
+			mask2 = 0;
 			c = *pr_file_p++;
 			if (!c)
 				PR_ParseError ("EOF inside quote");
 			if (c == 'n')
 				c = '\n';
 			else if (c == '"')
-				c = '"';
+				c = '"' | mask1;
+			else if (c == '\\')
+				c = '\\' | mask1;
+			else if (c == 'b')
+			{
+				mask1 ^= 128;
+				continue;
+			}
+			else if (c == '[')
+				c = 16;
+			else if (c == ']')
+				c = 17;
+			else if (c == '.')
+				c = 28 | mask1;
+			else if (c == '\n' || c=='\r')
+			{
+				// FrikaC: Windoze/DOS have both CR & LF, so let's keep checking
+				// this has the side effect of potentially bumping the line num more than needed..
+				// FIXME
+				while(*pr_file_p == '\n' || *pr_file_p =='\r')
+					pr_file_p++;
+				pr_source_line++;
+				continue;
+			}
+			else if (c == '<')
+				c = 29;
+			else if (c == '-')
+				c = 30;
+			else if (c == '>')
+				c = 31;
+			else if (c >= '0' && c <= '9')
+				c = 18 + c - '0';
+			else if (c == '(')
+				c = 128;
+			else if (c == '=')
+				c = 129;
+			else if (c == ')')
+				c = 130;
+			else if (c == '{')
+			{
+				int d;
+				c = 0;
+				while ((d = *pr_file_p++) != '}')
+				{
+					c = c * 10 + d - '0';
+					if (d < '0' || d > '9' || c > 255)
+						PR_ParseError("Bad character code");
+				}
+			}
 			else
 				PR_ParseError ("Unknown escape char");
 		}
 		else if (c=='\"')
 		{
-			pr_token[len] = 0;
-			pr_token_type = tt_immediate;
-			pr_immediate_type = &type_string;
-			strcpy (pr_immediate_string, pr_token);
-			return;
+			mask1 = 0;
+			PR_LexWhitespace ();
+			if (*pr_file_p == ':')
+			{
+				pr_file_p++;
+				pr_token[pr_immediate_strlen++] = 0;
+				PR_LexWhitespace();
+			}
+			if (*pr_file_p != '\"')
+			{
+				pr_token[pr_immediate_strlen++] = 0;
+				pr_token_type = tt_immediate;
+				pr_immediate_type = &type_string;
+				memcpy (pr_immediate_string, pr_token, pr_immediate_strlen);
+				return;
+			}
+			pr_file_p++;
+			continue;
 		}
-		pr_token[len] = c;
-		len++;
+		pr_token[pr_immediate_strlen++] = c | (mask1 & mask2);
 	} while (1);
 }
 
@@ -184,6 +241,54 @@ float PR_LexNumber (void)
 
 /*
 ==============
+PR_LexInt
+==============
+*/
+unsigned int PR_LexInt (void)
+{
+	int		c;
+	int		len;
+	
+	len = 0;
+	c = *pr_file_p;
+	do
+	{
+		pr_token[len] = c;
+		len++;
+		pr_file_p++;
+		c = *pr_file_p;
+	} while ((c >= '0' && c<= '9') || c == '-');
+	pr_token[len] = 0;
+	return atoi (pr_token);
+}
+
+/*
+==============
+PR_LexHex
+==============
+*/
+unsigned int PR_LexHex (void)
+{
+	unsigned int		c;
+	int		len;
+	
+	len = 0;
+	pr_file_p += 2;
+	c = *pr_file_p;
+	do
+	{
+		pr_token[len] = c;
+		len++;
+		pr_file_p++;
+		c = *pr_file_p;
+	} while ((c >= '0' && c<= '9') || (c >= 'a' && c <= 'f'));
+	pr_token[len] = 0;
+	sscanf(pr_token, "%x", &c);
+	return c;
+}
+
+/*
+==============
 PR_LexVector
 
 Parses a single quoted vector
@@ -206,6 +311,7 @@ void PR_LexVector (void)
 	pr_file_p++;
 }
 
+boolean PR_FindMacro (void);
 /*
 ==============
 PR_LexName
@@ -217,9 +323,10 @@ void PR_LexName (void)
 {
 	int		c;
 	int		len;
-	
+	def_t *d;
 	len = 0;
 	c = *pr_file_p;
+
 	do
 	{
 		pr_token[len] = c;
@@ -228,8 +335,18 @@ void PR_LexName (void)
 		c = *pr_file_p;
 	} while ( (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' 
 	|| (c >= '0' && c <= '9'));
+
 	pr_token[len] = 0;
+//	PR_FindMacro();
 	pr_token_type = tt_name;
+
+	d = PR_GetDef(NULL, pr_token, pr_scope, false, 0, 0);
+	if (d)
+	{
+		memcpy (&pr_immediate, pr_globals + d->ofs, 4*type_size[d->type->type]);
+		pr_immediate_type = d->type;
+	}
+
 }
 
 /*
@@ -239,22 +356,29 @@ PR_LexPunctuation
 */
 void PR_LexPunctuation (void)
 {
-	int		i;
-	int		len;
+	int	i;
 	char	*p;
-	
+	int	len;
+
 	pr_token_type = tt_punct;
-	
-	for (i=0 ; (p = pr_punctuation[i]) != NULL ; i++)
+
+	for (i=0; (p = pr_punctuation[i]) != NULL; i++)
 	{
-		len = strlen(p);
-		if (!strncmp(p, pr_file_p, len) )
+		len = pr_punct_length[i];
+		if (!STRNCMP(p, pr_file_p, len) )
 		{
-			strcpy (pr_token, p);
+			memcpy(pr_token, p, len+1);
 			if (p[0] == '{')
 				pr_bracelevel++;
 			else if (p[0] == '}')
+			{
 				pr_bracelevel--;
+				if (pr_bracelevel < 0)
+				{
+					PR_ParseWarning(1, "Too many closing braces");
+					pr_bracelevel = 0;
+				}
+			}
 			pr_file_p += len;
 			return;
 		}
@@ -288,8 +412,12 @@ void PR_LexWhitespace (void)
 	// skip // comments
 		if (c=='/' && pr_file_p[1] == '/')
 		{
+		//	if (pr_file_p[2] == '^')
+		//		pr_file_p++;
 			while (*pr_file_p && *pr_file_p != '\n')
 				pr_file_p++;
+			if (*pr_file_p == 0)
+				return;
 			PR_NewLine();
 			pr_file_p++;
 			continue;
@@ -303,7 +431,7 @@ void PR_LexWhitespace (void)
 				pr_file_p++;
 				if (pr_file_p[0]=='\n')
 					PR_NewLine();
-				if (pr_file_p[1] == 0)
+				if (!*pr_file_p)
 					return;
 			} while (pr_file_p[-1] != '*' || pr_file_p[0] != '/');
 			pr_file_p++;
@@ -315,32 +443,6 @@ void PR_LexWhitespace (void)
 }
 
 //============================================================================
-
-#define	MAX_FRAMES	256
-
-char	pr_framemacros[MAX_FRAMES][16];
-int		pr_nummacros;
-
-void PR_ClearGrabMacros (void)
-{
-	pr_nummacros = 0;
-}
-
-void PR_FindMacro (void)
-{
-	int		i;
-	
-	for (i=0 ; i<pr_nummacros ; i++)
-		if (!strcmp (pr_token, pr_framemacros[i]))
-		{
-			sprintf (pr_token,"%d", i);
-			pr_token_type = tt_immediate;
-			pr_immediate_type = &type_float;
-			pr_immediate._float = i;
-			return;
-		}
-	PR_ParseError ("Unknown frame macro $%s", pr_token);
-}
 
 // just parses text, returning false if an eol is reached
 boolean PR_SimpleGetToken (void)
@@ -355,9 +457,8 @@ boolean PR_SimpleGetToken (void)
 			return false;
 		pr_file_p++;
 	}
-	
 	i = 0;
-	while ( (c = *pr_file_p) > ' ' && c != ',' && c != ';')
+	while ( (c = *pr_file_p) > ' ' && c != ',' && c != ';' && c != ')')
 	{
 		pr_token[i] = c;
 		i++;
@@ -367,12 +468,57 @@ boolean PR_SimpleGetToken (void)
 	return true;
 }
 
+int		pr_nummacros;
+
+void PR_ClearGrabMacros (void)
+{
+	pr_nummacros = 0;
+}
+
+int PR_FindDefine (char *name)
+{
+	int i, h;
+	h = hash(name);
+	i = macrohash[h];
+	if (i && !STRCMP(name, pr_defines[i].name))
+		return i;
+	for (i=num_defines ; i>0 ; i--)
+	{
+		if (!STRCMP (pr_token, pr_defines[i].name))
+		{
+			macrohash[h] = i;
+			return i;
+		}
+	}
+	return 0;
+}
+
+boolean PR_FindMacro (void)
+{
+	int i;
+	i = PR_FindDefine(pr_token);
+	if (!i)
+		return false;
+	pr_token_type = tt_immediate;
+	pr_immediate_type = pr_defines[i].type;
+	memcpy(&pr_immediate, &(pr_defines[i].value), sizeof(eval_t));
+	HashImmediate();
+	return true;
+}
+
+
 void PR_ParseFrame (void)
 {
 	while (PR_SimpleGetToken ())
 	{
-		strcpy (pr_framemacros[pr_nummacros], pr_token);
+		num_defines++;
+		macrohash[hash(pr_token)] = num_defines;
+		pr_defines[num_defines].name = (char *)PR_Malloc(strlen(pr_token) + 1);
+		strcpy(pr_defines[num_defines].name, pr_token);
+		pr_defines[num_defines].value._float = pr_nummacros;
+		pr_defines[num_defines].type = &type_float;
 		pr_nummacros++;
+
 	}
 }
 
@@ -390,29 +536,324 @@ void PR_LexGrab (void)
 		PR_ParseError ("hanging $");
 	
 // check for $frame
-	if (!strcmp (pr_token, "frame"))
+	if (!STRCMP (pr_token, "frame"))
 	{
 		PR_ParseFrame ();
 		PR_Lex ();
 	}
 // ignore other known $commands
-	else if (!strcmp (pr_token, "cd")
-	|| !strcmp (pr_token, "origin")
-	|| !strcmp (pr_token, "base")
-	|| !strcmp (pr_token, "flags")
-	|| !strcmp (pr_token, "scale")
-	|| !strcmp (pr_token, "skin") )
+	else if (!STRCMP (pr_token, "cd")
+	|| !STRCMP (pr_token, "origin")
+	|| !STRCMP (pr_token, "base")
+	|| !STRCMP (pr_token, "flags")
+	|| !STRCMP (pr_token, "scale")
+	|| !STRCMP (pr_token, "skin") )
 	{	// skip to end of line
 		while (PR_SimpleGetToken ())
 		;
 		PR_Lex ();
 	}
+// hexen II commands
+	else if (!STRCMP (pr_token, "framevalue") || !STRCMP(pr_token, "framerestore"))
+	{
+		PR_Lex();
+		pr_nummacros = pr_immediate._float;
+		PR_Lex();
+	}
+	else if (!STRCMP (pr_token, "framesave"))
+	{
+		if (!PR_SimpleGetToken())
+			PR_ParseError("$framesave: bad bookmark");
+
+		num_defines++;
+		pr_defines[num_defines].name = (char *)PR_Malloc(strlen(pr_token) + 1);
+		strcpy(pr_defines[num_defines].name, pr_token);
+		macrohash[hash(pr_token)] = num_defines;
+		PR_Lex();
+		pr_defines[num_defines].type = &type_float;
+		pr_defines[num_defines].value._float = pr_nummacros;
+		PR_Lex();
+	}
 // look for a frame name macro
+
 	else
-		PR_FindMacro ();
+	{
+		if (!PR_FindMacro ())
+			PR_ParseError("Unknown frame macro %s", pr_token);
+
+	}
 }
+extern char	sourcedir[1024];
+extern char	includedir[1024];
+extern char destfile[1024];
+char old_file[1024];
+extern boolean pr_pause;
+extern boolean logging;
 
 //============================================================================
+
+int ifdefdepth;
+int ignoredepth;
+
+void PR_LexPrecomp (void)
+{
+	char *oldpos;
+	char	*src, *src2;
+	char filename[1024];
+	int backup_line, i;
+
+	// yeah it isn't quite Precompiler is it?
+	pr_file_p++;	// skip the hash
+	if (!PR_SimpleGetToken ())
+		PR_ParseError ("invalid precompiler command"); // that's not possible
+	
+	if (!STRCMP(pr_token, "ifdef"))
+	{
+
+		if (ifdefdepth > ignoredepth)
+		{
+			ifdefdepth++;
+			return;
+		}
+		ifdefdepth++;
+		ignoredepth = ifdefdepth;
+		PR_Lex();
+		if (!PR_FindDefine(pr_token))
+		{
+			ignoredepth--;
+			while(ifdefdepth > ignoredepth)
+				PR_Lex();
+			return;
+		}
+		PR_Lex();
+		return;
+	}
+	if (!STRCMP(pr_token, "ifndef"))
+	{
+		if (ifdefdepth > ignoredepth)
+		{
+			ifdefdepth++;
+			return;
+		}
+		ifdefdepth++;
+		ignoredepth = ifdefdepth;
+		PR_Lex();
+		if (PR_FindDefine(pr_token))
+		{
+			ignoredepth--;
+			while(ifdefdepth > ignoredepth)
+				PR_Lex();
+			return;
+		}
+		PR_Lex();
+		return;
+	}
+	if (!STRCMP(pr_token, "endif"))
+	{
+		ifdefdepth--;
+		if (ifdefdepth < 0)
+			PR_ParseWarning(1, "too many #endifs");
+		PR_Lex();
+		return;
+	}
+	if (!STRCMP(pr_token, "else"))
+	{
+		if (ifdefdepth != (ignoredepth + 1))
+		{
+			PR_Lex();
+			return;
+		}
+		ignoredepth = ifdefdepth > ignoredepth ? ifdefdepth : ifdefdepth - 1;
+
+		do
+		{
+			PR_Lex();
+		}
+		while(ifdefdepth > ignoredepth);
+		return;
+	}
+
+	if (ifdefdepth > ignoredepth)
+	{
+//		print("ignored %s on %s(%i)", pr_token, s_file + strings, pr_source_line);
+		return;
+	}
+	if (PR_Check("pragma"))
+	{
+		if (PR_Check("message"))
+		{
+			if (pr_immediate_type != &type_string)
+				PR_ParseError("message must be a string");
+			print("%s", pr_immediate_string);
+			PR_Lex();
+			return;
+		}
+
+		if (!STRCMP(pr_token, "PROGS_DAT"))
+		{
+			if (!PR_SimpleGetToken ())
+				PR_ParseError("mangled PROGS_DAT directive");
+			strcpy(destfile, pr_token);
+			// changed output..
+			PR_Lex();
+			return;
+
+		}
+		if (!STRCMP(pr_token, "incudedir"))
+		{
+			if(!PR_SimpleGetToken())
+				PR_ParseError("mangled includedir");
+			strcpy(includedir, pr_token);
+			PR_Lex();
+			return;
+		}
+		PR_ParseWarning(1, "unknown pragma %s", pr_token);
+		// skip to the end of the line
+		while (PR_SimpleGetToken ())
+			;
+		PR_Lex ();
+		return;
+	}
+	if (!STRCMP(pr_token, "includelist"))
+	{
+
+		while(1)
+		{
+			if(PR_SimpleGetToken())
+			{
+				oldpos = pr_file_p;
+				backup_line = pr_source_line;
+				strcpy(old_file, strings + s_file);
+				if (!STRCMP(pr_token, "#endlist"))
+					break;
+				src2 = pr_token;
+				sprintf (filename, "%s%s", sourcedir, src2);
+				LoadFile (filename, (void **)&src2);
+				print("%s", filename);
+				if(!PR_CompileFile (src2, filename))
+				{
+					EndProgram(false);
+					return;
+				}
+
+				pr_file_p = oldpos; // uhhh
+				pr_source_line = backup_line;
+				s_file = old_file - strings;
+			}
+			else if(!*pr_file_p++)
+			{
+				PR_ParseError("eof in #includelist, terminate with #endlist");
+			}
+		}
+		pr_file_p = oldpos; // uhhh
+		pr_source_line = backup_line;
+		s_file = old_file - strings;
+		PR_Lex();
+		return;
+	}
+	if (!STRCMP(pr_token, "include"))
+	{
+		if(!PR_SimpleGetToken())
+			PR_ParseError("mangled include directive");
+		src2 = pr_token;
+
+		if (pr_token[0] == '\"')
+		{
+			if (pr_file_p[-1] != '\"')
+				PR_ParseError("invalid #include string");
+			src2++;
+			pr_token[strlen(pr_token) - 1] = 0; // testing?
+			sprintf (filename, "%s%s", sourcedir, src2);
+		}
+		else if (pr_token[0] == '<')
+		{
+			if (pr_file_p[-1] != '>')
+				PR_ParseError("invalid #include string");
+			src2++;
+			pr_token[strlen(pr_token) - 1] = 0; // testing?
+			sprintf (filename, "%s%s", includedir, src2);
+		}
+		else
+				sprintf (filename, "%s%s", sourcedir, src2);
+		// back up all global data on current file
+		strcpy(old_file, strings + s_file);
+		oldpos = pr_file_p;
+		backup_line = pr_source_line;
+	//	printf ("including %s\n", filename);
+		LoadFile (filename, (void **)&src);
+		if(!PR_CompileFile (src, src2))
+		{
+			EndProgram(false);
+			return;
+		}
+		pr_file_p = oldpos; // uhhh
+		pr_source_line = backup_line;
+		s_file = old_file - strings;
+		PR_Lex();
+		return;
+	}
+	if (PR_Check("error"))
+	{
+		if (pr_immediate_type != &type_string)
+			PR_ParseError("error must be a string");
+		PR_ParseError(pr_immediate_string);
+		PR_Lex();
+		return;
+	}
+	if (PR_Check("warning"))
+	{
+		if (pr_immediate_type != &type_string)
+			PR_ParseError("warning must be a string");
+		PR_ParseWarning(1, pr_immediate_string);
+		PR_Lex();
+		return;
+	}
+	if (PR_Check("define"))
+	{
+		if (pr_token_type != tt_name)
+			PR_ParseError("#define: Invalid name");
+
+		backup_line = pr_source_line;
+		i = ++num_defines;
+		pr_defines[i].name = (char *)PR_Malloc(strlen(pr_token) + 1);
+		macrohash[hash(pr_token)] = i;
+		strcpy(pr_defines[i].name, pr_token);
+		PR_Lex();
+		if (pr_token_type == tt_immediate)
+		{
+			pr_defines[i].type = pr_immediate_type;
+			memcpy(&(pr_defines[i].value), &pr_immediate, sizeof(eval_t));
+			PR_Lex();
+		}
+
+		return;
+	}
+	if (PR_Check("undef"))
+	{
+
+		if (pr_token_type != tt_name)
+			PR_ParseError("#undef: Invalid name");
+		num_defines--;
+		backup_line = PR_FindDefine(pr_token);
+		for(i = backup_line; i <= num_defines; i++)
+			memcpy(&(pr_defines[i]), &(pr_defines[i+1]), sizeof(define_t));
+		for (i = 0; i < HSIZE1; i++)
+		{
+			if (macrohash[i] > backup_line)
+				macrohash[i]--;
+			else if (macrohash[i] == backup_line)
+				macrohash[i] = 0;
+		}	
+		PR_Lex();
+		return;
+	}
+
+	if(!PR_FindMacro())
+	{
+		PR_ParseWarning(1, "unknown directive %s", pr_token);
+	}
+
+}
 
 /*
 ==============
@@ -426,7 +867,9 @@ void PR_Lex (void)
 	int		c;
 
 	pr_token[0] = 0;
-	
+	pr_immediate_index = -1;
+
+
 	if (!pr_file_p)
 	{
 		pr_token_type = tt_eof;
@@ -447,23 +890,68 @@ void PR_Lex (void)
 	if (c == '\"')
 	{
 		PR_LexString ();
+		HashImmediate();
 		return;
 	}
-
+	if (c == '%')
+	{
+		c = *++pr_file_p;
+		expectint = true;
+	}
 // handle quoted vectors as a unit
 	if (c == '\'')
 	{
-		PR_LexVector ();
+		if (pr_file_p[2] == '\'')
+		{
+			pr_token_type = tt_immediate;
+			if (expectint)
+			{
+				pr_immediate_type = &type_int;
+				pr_immediate._int = pr_file_p[1];
+			}
+			else
+			{
+				pr_immediate_type = &type_float;
+				pr_immediate._float = pr_file_p[1];
+			}
+			expectint = false;
+			pr_file_p += 3;
+		}
+		else
+			PR_LexVector ();
+		HashImmediate();
+		return;
+	}
+
+	if (c == '0' && pr_file_p[1] == 'x')
+	{
+		pr_token_type = tt_immediate;
+		pr_immediate_type = &type_float;
+		pr_immediate._int = PR_LexHex ();
+		HashImmediate();
 		return;
 	}
 
 // if the first character is a valid identifier, parse until a non-id
 // character is reached
+
 	if ( (c >= '0' && c <= '9') || ( c=='-' && pr_file_p[1]>='0' && pr_file_p[1] <='9') )
 	{
 		pr_token_type = tt_immediate;
-		pr_immediate_type = &type_float;
-		pr_immediate._float = PR_LexNumber ();
+		if (expectint)
+		{
+			pr_immediate_type = &type_int;
+			pr_immediate._int = PR_LexInt ();
+			expectint = false;
+		}
+		else
+		{
+			pr_immediate_type = &type_float;
+			pr_immediate._float = PR_LexNumber ();
+		}
+		
+
+		HashImmediate();
 		return;
 	}
 	
@@ -478,7 +966,14 @@ void PR_Lex (void)
 		PR_LexGrab ();
 		return;
 	}
-	
+	if (c == '#')
+	{
+		if ( (pr_file_p[1] >= 'a' && pr_file_p[1] <= 'z') || (pr_file_p[1] >= 'A' && pr_file_p[1] <= 'Z') || pr_file_p[1] == '_' )
+		{
+			PR_LexPrecomp();
+			return;
+		}
+	}
 // parse symbol strings until a non-symbol is found
 	PR_LexPunctuation ();
 }
@@ -486,59 +981,92 @@ void PR_Lex (void)
 //=============================================================================
 
 /*
+================
+ErrorLog
+================
+*/
+FILE *logfile;
+
+void ErrorLog(char *fmt, ...)
+{
+    va_list argptr;
+    static char data[1024];
+
+
+    va_start(argptr, fmt);
+    vsprintf(data, fmt, argptr);
+    va_end(argptr);
+	if (!logfile)
+		logfile = Sys_fopen("error.log", "w");
+	if (!logfile)
+		Sys_Error("Error writing error.log: %s\nTry using -nolog" , strerror(errno));
+
+    fprintf(logfile, data);
+    //close(f);
+}
+/*
 ============
 PR_ParseError
 
 Aborts the current file load
 ============
 */
+boolean logging;
+extern char	sourcedir[1024];
 void PR_ParseError (char *error, ...)
 {
 	va_list		argptr;
 	char		string[1024];
-
+//	*(int *)-4 = 0;	// dump to debugger
 	va_start (argptr,error);
 	vsprintf (string,error,argptr);
 	va_end (argptr);
 
-	printf ("%s:%i:%s\n", strings + s_file, pr_source_line, string);
-	
-	longjmp (pr_parse_abort, 1);
+	conditional = false;
+#ifdef WIN32GUI
+	ErrorPrint(strings + s_file, pr_source_line, "Error %s(%i): %s", strings + s_file, pr_source_line, string);
+#else
+	print("%s(%i): error: %s", strings + s_file, pr_source_line, string);
+#endif
+	if (logging)
+		ErrorLog("error: %s:%i:%s\n", strings + s_file, pr_source_line, string);
+	if (Q_strcmp(s_file + strings, "LINK"))
+		longjmp (pr_parse_abort, 1);
+	else
+		pr_error_count++;
+
+
 }
-
-
 /*
-=============
-PR_Expect
+============
+PR_ParseWarning
 
-Issues an error if the current token isn't equal to string
-Gets the next token
-=============
+
+============
 */
-void PR_Expect (char *string)
+
+int		pr_warning_count;
+
+void PR_ParseWarning (int level, char *warn, ...)
 {
-	if (strcmp (string, pr_token))
-		PR_ParseError ("expected %s, found %s",string, pr_token);
-	PR_Lex ();
+	va_list		argptr;
+	char		string[1024];
+	if (level > warninglevel)
+			return;
+	va_start (argptr,warn);
+	vsprintf (string,warn,argptr);
+	va_end (argptr);
+
+	pr_warning_count++;
+#ifdef WIN32GUI
+	ErrorPrint(strings + s_file, pr_source_line, "Warning %s(%i): %s", strings + s_file, pr_source_line, string);
+#else
+	print ("%s(%i): warning: %s", strings + s_file, pr_source_line, string);
+#endif
+	if (logging)
+		ErrorLog("warning: %s:%i:%s\n", strings + s_file, pr_source_line, string);
 }
 
-
-/*
-=============
-PR_Check
-
-Returns true and gets the next token if the current token equals string
-Returns false and does nothing otherwise
-=============
-*/
-boolean PR_Check (char *string)
-{
-	if (strcmp (string, pr_token))
-		return false;
-		
-	PR_Lex ();
-	return true;
-}
 
 /*
 ============
@@ -552,7 +1080,7 @@ char *PR_ParseName (void)
 	static char	ident[MAX_NAME];
 	
 	if (pr_token_type != tt_name)
-		PR_ParseError ("not a name");
+		PR_ParseError ("\"%s\" is not a name", pr_token);
 	if (strlen(pr_token) >= MAX_NAME-1)
 		PR_ParseError ("name too long");
 	strcpy (ident, pr_token);
@@ -579,7 +1107,8 @@ type_t *PR_FindType (type_t *type)
 	{
 		if (check->type != type->type
 		|| check->aux_type != type->aux_type
-		|| check->num_parms != type->num_parms)
+		|| check->num_parms != type->num_parms
+		|| type->arraysize)
 			continue;
 	
 		for (i=0 ; i< type->num_parms ; i++)
@@ -591,13 +1120,13 @@ type_t *PR_FindType (type_t *type)
 	}
 	
 // allocate a new one
-	check = malloc (sizeof (*check));
+	check = (struct type_s *) PR_Malloc (sizeof (*check));
 	*check = *type;
 	check->next = pr.types;
 	pr.types = check;
 	
 // allocate a generic def for the type, so fields can reference it
-	def = malloc (sizeof(def_t));
+	def = (struct def_s *) PR_Malloc (sizeof(def_t));
 	def->name = "COMPLEX TYPE";
 	def->type = check;
 	check->def = def;
@@ -616,10 +1145,19 @@ void PR_SkipToSemicolon (void)
 {
 	do
 	{
-		if (!pr_bracelevel && PR_Check (";"))
-			return;
+		if (!pr_bracelevel)
+		{
+			if (PR_Check(";"))
+				return;
+			if (PR_Check("}"))
+			{
+				PR_Check(";");
+				return;
+			}
+		}
+
 		PR_Lex ();
-	} while (pr_token[0]);	// eof will return a null token
+	} while (pr_token_type != tt_eof);
 }
 
 
@@ -630,66 +1168,125 @@ PR_ParseType
 Parses a variable type, including field and functions types
 ============
 */
-char	pr_parm_names[MAX_PARMS][MAX_NAME];
+char	pr_parm_names[MAX_PARMS + MAX_EXTRA_PARMS][MAX_NAME];
+type_t *PR_ParseTypeFunction (type_t *type);
 
 type_t *PR_ParseType (void)
 {
-	type_t	new;
-	type_t	*type;
-	char	*name;
+	type_t	newtype;
+	type_t	*type, *insert, *t;
 	
 	if (PR_Check ("."))
 	{
-		memset (&new, 0, sizeof(new));
-		new.type = ev_field;
-		new.aux_type = PR_ParseType ();
-		return PR_FindType (&new);
+		memset (&newtype, 0, sizeof(newtype));
+		newtype.type = ev_field;
+		newtype.aux_type = PR_ParseType ();
+		if (newtype.aux_type->arraysize)
+			PR_ParseError("field arrays not supported");
+
+		return PR_FindType (&newtype);
 	}
 	
-	if (!strcmp (pr_token, "float") )
+	if (!STRCMP (pr_token, "float") )
 		type = &type_float;
-	else if (!strcmp (pr_token, "vector") )
+	else if (!STRCMP (pr_token, "int") )
+		type = &type_int;
+	else if (!STRCMP (pr_token, "vector") )
 		type = &type_vector;
-	else if (!strcmp (pr_token, "float") )
-		type = &type_float;
-	else if (!strcmp (pr_token, "entity") )
+	else if (!STRCMP (pr_token, "entity") )
 		type = &type_entity;
-	else if (!strcmp (pr_token, "string") )
+	else if (!STRCMP (pr_token, "string") )
 		type = &type_string;
-	else if (!strcmp (pr_token, "void") )
+	else if (!STRCMP (pr_token, "void") )
 		type = &type_void;
 	else
 	{
 		PR_ParseError ("\"%s\" is not a type", pr_token);
-		type = &type_float;	// shut up compiler warning
+		type = &type_float;	// shut up compiler error
 	}
 	PR_Lex ();
-	
-	if (!PR_Check ("("))
-		return type;
-	
+	if (PR_Check("field"))
+	{
+		memset (&newtype, 0, sizeof(newtype));
+		newtype.type = ev_field;
+		newtype.aux_type = type;
+		type = PR_FindType (&newtype);
+	}
+	if (PR_Check ("("))
+		type = PR_ParseTypeFunction (type);
+	if (PR_Check ("["))
+	{
+		memset (&newtype, 0, sizeof(newtype));
+		newtype.type = ev_void;
+		if (pr_immediate._float <= 0)
+			PR_ParseError("Cannot allocate an array of %i", pr_immediate._float);
+		newtype.arraysize = pr_immediate._float;
+		PR_Lex();
+
+		newtype.aux_type = type;
+		PR_Expect("]");
+
+		type = PR_FindType (&newtype);
+		insert = type;
+		while(PR_Check("["))
+		{
+			memset (&newtype, 0, sizeof(newtype));
+			newtype.type = ev_void;
+			if (pr_immediate._float <= 0)
+				PR_ParseError("Cannot allocate an array of %i", pr_immediate._float);
+			newtype.arraysize = pr_immediate._float;
+			PR_Lex();
+
+			newtype.aux_type = insert->aux_type;
+			PR_Expect("]");
+			insert->aux_type = PR_FindType (&newtype);
+			insert = insert->aux_type;
+		}
+	}
+	return type;
+}
+
+
+type_t *PR_ParseTypeFunction (type_t *type)
+{
+	type_t	newtype;
+	type_t	*ttype;
+	char	*name;
+	static int recurse = 0;
+
 // function type
-	memset (&new, 0, sizeof(new));
-	new.type = ev_function;
-	new.aux_type = type;	// return type
-	new.num_parms = 0;
+	memset (&newtype, 0, sizeof(newtype));
+	newtype.type = ev_function;
+	newtype.aux_type = type;	// return type
+	newtype.num_parms = 0;
 	if (!PR_Check (")"))
 	{
-		if (PR_Check ("..."))
-			new.num_parms = -1;	// variable args
-		else
-			do
+		do
+		{
+			if (PR_Check ("..."))
 			{
-				type = PR_ParseType ();
+				newtype.num_parms = -1 - newtype.num_parms;	// variable args
+				break;
+			}
+			else
+			{
+				recurse++;
+				ttype = PR_ParseType ();
+				recurse--;
+
+				if (ttype->type == ev_void)
+					if (PR_Check(")"))
+						return PR_FindType (&newtype);
 				name = PR_ParseName ();
-				strcpy (pr_parm_names[new.num_parms], name);
-				new.parm_types[new.num_parms] = type;
-				new.num_parms++;
-			} while (PR_Check (","));
+				if (!recurse)
+					strcpy (pr_parm_names[newtype.num_parms], name);
+				newtype.parm_types[newtype.num_parms] = ttype;
+				newtype.num_parms++;
+			} 
+		} while (PR_Check (","));
 	
 		PR_Expect (")");
 	}
 	
-	return PR_FindType (&new);
+	return PR_FindType (&newtype);
 }
-

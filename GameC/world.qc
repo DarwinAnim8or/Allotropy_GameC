@@ -188,6 +188,7 @@ World Types:
 void() worldspawn =
 {
 	lastspawn = world;
+	BotInit(); //GieV: Initialize FrikBot
 	InitBodyQue ();
 
 // custom map attributes
@@ -355,8 +356,8 @@ void() worldspawn =
 	lightstyle(63, "a");
 };
 
-void() StartFrame =
-{
+void() StartFrame = {
+	BotFrame(); //GieV: FrikBot
 	teamplay = cvar("teamplay");
 	skill = cvar("skill");
 	framecount = framecount + 1;
