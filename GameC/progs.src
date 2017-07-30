@@ -2,6 +2,7 @@
 
 defs.qc
 
+//waypoints for the bots to use, doesn't have to be inside of the QC source, though.
 waypoints/map_dm1.qc
 waypoints/map_dm2.qc
 waypoints/map_dm3.qc
@@ -9,6 +10,7 @@ waypoints/map_dm4.qc
 waypoints/map_dm5.qc
 waypoints/map_dm6.qc
 
+//frikbot source
 frikbot/bot.qc
 frikbot/bot_way.qc
 frikbot/bot_fight.qc 
@@ -18,12 +20,15 @@ frikbot/bot_phys.qc
 frikbot/bot_move.qc
 frikbot/bot_ed.qc
 
+//general
 flashlight.qc
 subs.qc
 fight.qc
 ai.qc
 combat.qc
 items.qc
+splat.qc
+blood.qc
 weapons.qc
 splash.qc
 world.qc
@@ -36,6 +41,8 @@ triggers.qc
 plats.qc
 misc.qc
 
+//enemies
+corpse.qc
 ogre.qc
 demon.qc
 shambler.qc

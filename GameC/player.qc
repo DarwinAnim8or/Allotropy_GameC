@@ -488,9 +488,9 @@ void(string gibname, float dm) ThrowGib =
 	new.avelocity_x = random()*600;
 	new.avelocity_y = random()*600;
 	new.avelocity_z = random()*600;
-	new.think = SUB_Remove;
+	new.think = blood;	//GieV: call the blood function instead of 'SUB_Remove'.
 	new.ltime = time;
-	new.nextthink = time + 10 + random()*10;
+	new.nextthink = time + 0.01; // time + 10 + random()*10;
 	new.frame = 0;
 	new.flags = 0;
 };
@@ -499,7 +499,8 @@ void(string gibname, float dm) ThrowHead =
 {
 	setmodel (self, gibname);
 	self.frame = 0;
-	self.nextthink = -1;
+	self.think = blood;
+	self.nextthink = time + 0.01;
 	self.movetype = MOVETYPE_BOUNCE;
 	self.takedamage = DAMAGE_NO;
 	self.solid = SOLID_NOT;

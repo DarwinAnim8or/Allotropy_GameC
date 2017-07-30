@@ -41,6 +41,7 @@ void() W_Precache =
 	precache_sound ("weapons/bounce.wav");		// grenade bounce
 	precache_sound ("weapons/shotgun.wav");	// super shotgun
 	precache_model ("models/null.spr"); // needed, otherwise the water splash won't work. 
+	precache_model ("models/zom_gib.mdl"); // needed for the blood splats
 };
 
 float() crandom =
@@ -219,8 +220,7 @@ BULLETS
 TraceAttack
 ================
 */
-void(float damage, vector dir) TraceAttack =
-{
+void(float damage, vector dir) TraceAttack = {
 	local	vector	vel, org;
 	
 	vel = normalize(dir + v_up*crandom() + v_right*crandom());
@@ -229,13 +229,13 @@ void(float damage, vector dir) TraceAttack =
 
 	org = trace_endpos - dir*4;
 
-	if (trace_ent.takedamage)
-	{
+	if (trace_ent.takedamage) {
 		SpawnBlood (org, vel*0.2, damage);
 		AddMultiDamage (trace_ent, damage);
-	}
-	else
-	{
+
+		if(random() < 0.4) //only 2 in 5 times to prevent overflows
+        		ThrowBloodSplat(dir, trace_endpos, trace_ent); //throw blood splat in direction of shot
+	} else {
 		WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
 		WriteByte (MSG_BROADCAST, TE_GUNSHOT);
 		WriteCoord (MSG_BROADCAST, org_x);
@@ -710,6 +710,15 @@ void() spike_touch =
 	{
 		spawn_touchblood (9);
 		T_Damage (other, self, self.owner, 9);
+	
+		if (random() < 0.8) //only 4 in 5 times to prevent overflows
+		{
+			self.angles_x = self.angles_x*-1; //account for error in makevectors with non-player entities
+			makevectors(self.angles); //find direction nail is facing
+			ThrowBloodSplat(v_forward, self.origin, other); //throw blood splat in direction nail is facing
+		}
+
+
 	}
 	else
 	{
@@ -749,6 +758,15 @@ void() superspike_touch =
 	{
 		spawn_touchblood (18);
 		T_Damage (other, self, self.owner, 18);
+
+		if (random() < 0.8) //only 4 in 5 times to prevent overflows
+		{
+			self.angles_x = self.angles_x*-1; //account for error in makevectors with non-player entities
+			makevectors(self.angles); //find direction nail is facing
+			ThrowBloodSplat(v_forward, self.origin, other); //throw blood splat in direction nail is facing
+		}
+
+
 	}
 	else
 	{
