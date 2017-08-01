@@ -3,12 +3,12 @@
 defs.qc
 
 //waypoints for the bots to use, doesn't have to be inside of the QC source, though.
-waypoints/map_dm1.qc
-waypoints/map_dm2.qc
-waypoints/map_dm3.qc
-waypoints/map_dm4.qc
-waypoints/map_dm5.qc
-waypoints/map_dm6.qc
+//waypoints/map_dm1.qc
+//waypoints/map_dm2.qc
+//waypoints/map_dm3.qc
+//waypoints/map_dm4.qc
+//waypoints/map_dm5.qc
+//waypoints/map_dm6.qc
 
 //frikbot source
 frikbot/bot.qc

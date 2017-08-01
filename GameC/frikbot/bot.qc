@@ -105,7 +105,7 @@ Delete the code in bot_map_load, located below.
 void() bot_map_load = {
     // place your qc loaded waypoints here
 
-    if (mapname == "dm1")
+    /*if (mapname == "dm1")
         map_dm1();
     else if (mapname == "dm2")
         map_dm2();
@@ -116,7 +116,7 @@ void() bot_map_load = {
     else if (mapname == "dm5")
         map_dm5();
     else if (mapname == "dm6")
-        map_dm6();
+        map_dm6();*/
 };
 
 /*
