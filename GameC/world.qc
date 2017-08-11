@@ -304,7 +304,7 @@ void() worldspawn = {
 
     precache_model ("models/backpack.mdl");
 
-    precache_model ("models/zom_gib.mdl");
+    precache_model ("models/gib_drop.mdl");
 
     precache_model ("models/v_light.mdl");
 

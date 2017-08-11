@@ -61,7 +61,7 @@ void(vector dir, vector org, entity own) ThrowBloodSplat = {
     splat.nextthink = time + 2;
     splat.think = SUB_Remove;
 
-    setmodel (splat, "models/zom_gib.mdl");
+    setmodel (splat, "models/gib_drop.mdl");
     setsize (splat, '0 0 0', '0 0 0');
     setorigin (splat, org); //start splat at point of damage
 };

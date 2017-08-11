@@ -207,7 +207,7 @@ void(vector st) ZombieFireGrenade = {
     missile.nextthink = time + 2.5;
     missile.think = SUB_Remove;
 
-    setmodel (missile, "models/zom_gib.mdl");
+    setmodel (missile, "models/gib_drop.mdl");
     setsize (missile, '0 0 0', '0 0 0');
     setorigin (missile, org);
 };
@@ -485,7 +485,7 @@ void() monster_zombie = {
 
     precache_model ("models/zombie.mdl");
     precache_model ("models/h_zombie.mdl");
-    precache_model ("models/zom_gib.mdl");
+    precache_model ("models/gib_drop.mdl");
 
     precache_sound ("zombie/z_idle.wav");
     precache_sound ("zombie/z_idle1.wav");

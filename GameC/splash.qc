@@ -4,7 +4,13 @@
 */
 
 void() blue_particle_trail = {
-    particle(self.origin, '0 0 0', 210, 140);
+    particle(self.origin, '0 0 0', 220, 140);
+	//230 = blood
+	//220 = darker blue
+	//210 = Dark blue (minecraft-like)
+	//200 = mustard
+	//190 = slimey goop
+	//170 = dark brown
     self.think = blue_particle_trail;
     self.nextthink = time + 0.1;
 };

@@ -1132,12 +1132,12 @@ The next attack from the player will do 4x damage
 void() item_artifact_super_damage = {
     self.touch = powerup_touch;
 
-    precache_model ("models/quaddama.mdl");
+    precache_model ("models/skull.mdl");
     precache_sound ("items/damage.wav");
     precache_sound ("items/damage2.wav");
     precache_sound ("items/damage3.wav");
     self.noise = "items/damage.wav";
-    setmodel (self, "models/quaddama.mdl");
+    setmodel (self, "models/skull.mdl");
     self.netname = "Quad Damage";
     self.items = IT_QUAD;
     setsize (self, '-16 -16 -24', '16 16 32');

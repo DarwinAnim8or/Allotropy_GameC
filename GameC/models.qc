@@ -199,8 +199,8 @@ $skin skin
 $frame frame1
 
 
-$modelname quaddama
-$cd /raid/quake/id1/models/quaddama
+$modelname skull
+$cd /models/skull
 $flags 8		// client side rotate
 $base base
 $skin skin
