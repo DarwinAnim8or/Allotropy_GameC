@@ -116,6 +116,30 @@ string(float r) BotName = {
         self.b_pants = 5;
         self.b_shirt = 10;
         return "Hal";
+    } else if (r == 17) {
+        self.b_pants = 1;
+        self.b_shirt = 10;
+        return "Shishina";
+    } else if (r == 18) {
+        self.b_pants = 2;
+        self.b_shirt = 9;
+        return "Alexander";
+    } else if (r == 19) {
+        self.b_pants = 4;
+        self.b_shirt = 8;
+        return "ImNotFat";
+    } else if (r == 20) {
+        self.b_pants = 10;
+        self.b_shirt = 10;
+        return "Darwin";
+    } else if (r == 20) {
+        self.b_pants = 6;
+        self.b_shirt = 6;
+        return "Puzzlebark";
+    } else if (r == 21) {
+        self.b_pants = 2;
+        self.b_shirt = 2;
+        return "YourMom";
     }
 };
 string () PickARandomName = {
@@ -127,7 +151,7 @@ string () PickARandomName = {
     local entity t;
     y = TRUE;
     while(y) {
-        test = ceil(random() * 16);
+        test = ceil(random() * 21);
         h = BotName(test);
         t = find(world, netname, h);
         if (t == world)
@@ -174,7 +198,7 @@ void() bot_chat = {
     local float r;
     if (b_options & OPT_NOCHAT)
         return;
-    r = ceil (random() * 6);
+    r = ceil (random() * 16);
 
     if (self.b_chattime > time) {
         if (self.b_skill < 2)
@@ -212,9 +236,29 @@ void() bot_chat = {
                 else if (r == 3)
                     BotSay(": wh00p\n");
                 else if (r == 4)
-                    BotSay(": j00_sawk();\n");
+                    BotSay(": suck it\n");
                 else if (r == 5)
-                    BotSay(": i rule\n");
+                    BotSay(": git gud\n");
+		else if (r == 6) 
+		    BotSay(": get rekt son\n");
+		else if (r == 7)
+		    BotSay(": almost as easy as your mom\n");
+		else if (r == 8)
+		    BotSay(": is this easy mode?\n");
+		else if (r == 9)
+		    BotSay(": get lost\n");
+		else if (r == 10)
+		    BotSay(": are you afk, or just bad?\n");
+		else if (r == 11)
+		    BotSay(": Are you even trying?\n");
+		else if (r == 12)
+		    BotSay(": that was too easy\n");
+		else if (r == 13)
+		    BotSay(": better luck next time, birthday boy\n");
+		else if (r == 14)
+		    BotSay(": get DIPPED\n");
+		else if (r == 15)
+		    BotSay(": go back to singleplayer\n");
                 else
                     BotSay(": eat that\n");
                 bot_start_topic(0);
@@ -259,6 +303,36 @@ void() bot_chat = {
                     bot_start_topic(11);
                 } else if (r == 5) {
                     BotSay(": killer lag\n");
+                    bot_start_topic(11);
+                } else if (r == 6) {
+                    BotSay(": my dad wanted to explore my cave, sorry\n");
+                    bot_start_topic(11);
+                } else if (r == 7) {
+                    BotSay(": god this lag\n");
+                    bot_start_topic(11);
+                } else if (r == 8) {
+                    BotSay(": beginner's luck\n");
+                    bot_start_topic(11);
+                } else if (r == 9) {
+                    BotSay(": I have seen better\n");
+                    bot_start_topic(11);
+                } else if (r == 10) {
+                    BotSay(": mom walked in\n");
+                    bot_start_topic(11);
+                } else if (r == 11) {
+                    BotSay(": i fell down and can't get up\n");
+                    bot_start_topic(11);
+                } else if (r == 12) {
+                    BotSay(": oh wow, you manged to get a kill\n");
+                    bot_start_topic(11);
+                } else if (r == 13) {
+                    BotSay(": that luck\n");
+                    bot_start_topic(11);
+                } else if (r == 14) {
+                    BotSay(": dropped my chips\n");
+                    bot_start_topic(11);
+                } else if (r == 15) {
+                    BotSay(": my gears got stuck\n");
                     bot_start_topic(11);
                 } else {
                     BotSay(": 100% lag\n");
