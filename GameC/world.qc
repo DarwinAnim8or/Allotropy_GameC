@@ -287,7 +287,7 @@ void() worldspawn = {
     precache_model ("models/v_axe.mdl");
     precache_model ("models/v_shot.mdl");
     precache_model ("models/v_nail.mdl");
-    precache_model ("models/v_rock.mdl");
+    precache_model ("models/v_grnl.mdl");	// Grenade launcher model
     precache_model ("models/v_shot2.mdl");
     precache_model ("models/v_nail2.mdl");
     precache_model ("models/v_rock2.mdl");

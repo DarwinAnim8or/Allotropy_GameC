@@ -369,7 +369,7 @@ void() W_RocketSpeedup {
 	if (self.speed < 9) {
 		self.velocity = self.velocity * 2; //GOTTA GO FAST
 		self.speed = self.speed + 1;
-		self.nextthink = time + 5;
+		self.nextthink = time + 2;
 	} else if (self.speed == 9) { //Delete the rocket so it doesn't exist indefinitely
 		self.nextthink = time + 5;
 		self.think = SUB_Remove;	
@@ -783,7 +783,7 @@ void() W_SetCurrentAmmo = {
         self.items = self.items | IT_NAILS;
     } else if (self.weapon == IT_GRENADE_LAUNCHER) {
         self.currentammo = self.ammo_rockets;
-        self.weaponmodel = "models/v_rock.mdl";
+        self.weaponmodel = "models/v_grnl.mdl";
         self.weaponframe = 0;
         self.items = self.items | IT_ROCKETS;
     } else if (self.weapon == IT_ROCKET_LAUNCHER) {

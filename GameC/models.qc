@@ -117,8 +117,8 @@ $skin skin
 $frame shot1 shot2 shot3 shot4 shot5 shot6 shot6
 
 
-$modelname v_rock
-$cd /raid/quake/id1/models/v_rock
+$modelname v_grnl
+$cd /raid/quake/id1/models/v_grnl
 $origin 0 0 54
 $base base
 $skin skin

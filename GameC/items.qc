@@ -25,7 +25,7 @@ void() I_Precache = {
     precache_model ("models/g_shot.mdl");
     precache_model ("models/g_nail.mdl");
     precache_model ("models/g_nail2.mdl");
-    precache_model ("models/g_rock.mdl");
+    precache_model ("models/g_grnl.mdl");
     precache_model ("models/g_rock2.mdl");
     precache_model ("models/g_light.mdl");
 };
@@ -545,8 +545,8 @@ void() weapon_supernailgun = {
 */
 
 void() weapon_grenadelauncher = {
-    precache_model ("models/g_rock.mdl");
-    setmodel (self, "models/g_rock.mdl");
+    precache_model ("models/g_grnl.mdl");
+    setmodel (self, "models/g_grnl.mdl");
     self.weapon = 3;
     self.netname = "Grenade Launcher";
     self.touch = weapon_touch;
