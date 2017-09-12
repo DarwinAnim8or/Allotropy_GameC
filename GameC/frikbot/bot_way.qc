@@ -852,7 +852,7 @@ void(vector org, vector bit1, float bit4, float flargs) make_way = {
     y.b_shirt = bit1_z;
     y.b_frags = bit4;
     if (y.count == 1) {
-        localcmd("echo QuakeC waypoints detected\n");
+        localcmd("echo Hardcoded waypoints detected\n");
         y.think = FixWaypoints; // wait until all qc loaded points are spawned
         y.nextthink = time;
     }

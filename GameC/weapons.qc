@@ -360,7 +360,21 @@ void() T_MissileTouch = {
     BecomeExplosion ();
 };
 
-
+/*
+================
+W_RocketSpeedup
+================
+*/
+void() W_RocketSpeedup {
+	if (self.speed < 9) {
+		self.velocity = self.velocity * 2; //GOTTA GO FAST
+		self.speed = self.speed + 1;
+		self.nextthink = time + 5;
+	} else if (self.speed == 9) { //Delete the rocket so it doesn't exist indefinitely
+		self.nextthink = time + 5;
+		self.think = SUB_Remove;	
+	}
+};
 
 /*
 ================
@@ -385,14 +399,14 @@ void() W_FireRocket = {
 
     makevectors (self.v_angle);
     missile.velocity = aim(self, 1000);
-    missile.velocity = missile.velocity * 1000;
+    missile.velocity = missile.velocity * 500;
     missile.angles = vectoangles(missile.velocity);
 
     missile.touch = T_MissileTouch;
 
 // set missile duration
-    missile.nextthink = time + 5;
-    missile.think = SUB_Remove;
+    missile.nextthink = time + 0.01;
+    missile.think = W_RocketSpeedup;
 
     setmodel (missile, "models/missile.mdl");
     setsize (missile, '0 0 0', '0 0 0');

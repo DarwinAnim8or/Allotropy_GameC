@@ -1387,7 +1387,7 @@ void() DropBackpack = {
         item.netname = "Super Nailgun";
     } else if (item.items == IT_GRENADE_LAUNCHER) {
 
-        setmodel (item, "models/g_rock.mdl");
+        setmodel (item, "models/g_grnl.mdl");
         setsize (item, '-16 -16 0', '16 16 56');
         item.ammo_rockets = self.ammo_rockets;
         item.netname = "Grenade Launcher";

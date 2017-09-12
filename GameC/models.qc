@@ -52,8 +52,8 @@ $skin skin
 $frame shot2
 
 
-$modelname g_rock
-$cd /raid/quake/id1/models/g_rock
+$modelname g_grnl
+$cd /raid/quake/id1/models/g_grnl
 $flags 8		// client side rotate
 $origin 0 0 -24
 $base base
